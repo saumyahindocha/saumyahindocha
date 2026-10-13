@@ -42,6 +42,7 @@ export function ProjectBench({
       <p className="sr-only" aria-live="polite">
         {shown.length} projects shown
       </p>
+      <h2 className="sr-only">Project list</h2>
       <ul className="mt-10 grid gap-8 md:grid-cols-2 md:gap-10">
         {shown.map((p) => (
           <li key={p.code}>

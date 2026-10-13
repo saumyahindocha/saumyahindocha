@@ -11,10 +11,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.1",
     "framer-motion": "^14.1.0",
     "next": "16.0.0",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "three": "^0.180.0"
   },
   "devDependencies": {
     "@playwright/cli": "^0.1.22",
@@ -22,6 +25,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.180.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
     "prettier": "^3.9.10",

@@ -231,13 +231,40 @@ button {
   transform: none;
 }
 
-/* Project tile resting on the mat. */
+/* Project tile resting on the mat. Tilts toward the pointer in 3D; a soft glare follows it. */
 .tile {
-  transform: rotate(var(--tilt, 0deg));
+  --rx: 0deg;
+  --ry: 0deg;
+  transform: perspective(1100px) rotate(var(--tilt, 0deg));
   box-shadow: var(--shadow-rest);
   transition:
     transform 240ms var(--ease-bench),
     box-shadow 300ms var(--ease-bench);
+}
+.tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    420px circle at var(--gx, 50%) var(--gy, 0%),
+    rgb(255 250 232 / 0.12),
+    transparent 60%
+  );
+  transition: opacity 300ms var(--ease-bench);
+}
+@media (hover: hover) {
+  .tile:hover,
+  .tile:focus-within {
+    transform: perspective(1100px) translateY(-6px) rotateX(var(--rx)) rotateY(var(--ry));
+    box-shadow: var(--shadow-lift);
+  }
+  .tile:hover::before {
+    opacity: 1;
+  }
 }
 
 /* Plotter: drawing strokes trace themselves in once on load. */

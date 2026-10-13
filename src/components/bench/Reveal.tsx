@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode, type ElementType } from "react";
+import { useEffect, useRef, type ReactNode, type RefObject } from "react";
 
 /** Fades and rises its children once, the first time they scroll into view. */
 export function Reveal({
@@ -10,7 +10,7 @@ export function Reveal({
   delay = 0,
 }: {
   children: ReactNode;
-  as?: ElementType;
+  as?: "div" | "li" | "section";
   className?: string;
   delay?: number;
 }) {
@@ -35,7 +35,11 @@ export function Reveal({
   }, []);
 
   return (
-    <Tag ref={ref} className={`reveal ${className}`} style={{ transitionDelay: `${delay}ms` }}>
+    <Tag
+      ref={ref as RefObject<HTMLDivElement & HTMLLIElement>}
+      className={`reveal ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
       {children}
     </Tag>
   );

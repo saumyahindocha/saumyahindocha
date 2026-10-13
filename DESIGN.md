@@ -194,9 +194,17 @@ A measuring-tape divider: millimetre ticks, centimetre numbers in `sage-dim`. At
 A CAD dimension with extension ticks, arrowheads and a centred mono label. Used for durations
 ("≈ 1 month"), drawing callouts and the 404 page ("nothing measured here").
 
+### 3D models
+
+Built procedurally in React Three Fiber from real dimensions in the repos, on a transparent
+canvas so they sit on the mat with a contact shadow. Each loads lazily (after first paint for the
+hero, on scroll for tiles), shows its line drawing until ready, and stops rendering off-screen.
+Mouse users can orbit; on touch, dragging scrolls the page and a tap acts on the model.
+
 ### Desk lamp
 
-A very low-intensity radial lightening of the mat (6% warm white at the centre, 560 px radius)
+Tiles also tilt up to ~5° toward the pointer with a soft glare, and a touch on the mat brightens
+a small circle of grid lines under the finger. A very low-intensity radial lightening of the mat (6% warm white at the centre, 560 px radius)
 that follows a mouse pointer. Off on touch devices and with `prefers-reduced-motion`.
 
 ## Motion

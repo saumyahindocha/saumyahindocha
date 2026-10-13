@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import type { ProjectTileData, TileMedia } from "@/content/placeholder";
-import { CoolingTowerDrawing } from "./CoolingTowerDrawing";
+import { TowerWindow } from "./TowerWindow";
 import { Silk } from "./Silk";
 import { StatusChip } from "./StatusChip";
 import { SpecStrip } from "./SpecStrip";
@@ -91,7 +91,7 @@ function TileWindow({ media, featured }: { media: TileMedia; featured: boolean }
           className="size-full object-cover brightness-[0.88] saturate-[0.85] transition-[filter,transform] duration-300 group-hover:scale-[1.02] group-hover:brightness-100 group-hover:saturate-100"
         />
       ) : (
-        <CoolingTowerDrawing className="size-full p-3" />
+        <TowerWindow />
       )}
       <span
         aria-hidden

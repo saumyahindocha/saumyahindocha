@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AngleGuides } from "@/components/bench/AngleGuides";
 import { DimensionLine } from "@/components/bench/DimensionLine";
-import { BotPoster } from "@/components/bench/BotPoster";
+import { HeroModel } from "@/components/bench/HeroModel";
 import { ProjectTile } from "@/components/bench/ProjectTile";
 import { Reveal } from "@/components/bench/Reveal";
 import { RulerStrip } from "@/components/bench/RulerStrip";
@@ -57,9 +57,9 @@ function Hero() {
       </div>
 
       <figure className="relative mx-auto w-full max-w-[480px] md:max-w-none">
-        <BotPoster className="h-auto w-full" />
+        <HeroModel />
         <figcaption className="mt-2 text-center text-xs text-sage-dim">
-          NIDS, side view. Tap it to give it a push. The live balance sim lands in stage 3.
+          NIDS, built from its real dimensions. A push settles the way its MATLAB-tuned controller does.
         </figcaption>
       </figure>
     </section>

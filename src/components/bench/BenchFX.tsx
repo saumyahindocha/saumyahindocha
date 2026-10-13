@@ -32,6 +32,28 @@ export function BenchFX() {
     let px = 0; // page coords
     let py = 0;
     let fadeTimer = 0;
+    let tile: HTMLElement | null = null;
+
+    const resetTile = () => {
+      if (!tile) return;
+      tile.style.removeProperty("--rx");
+      tile.style.removeProperty("--ry");
+      tile = null;
+    };
+    // Tilt the hovered tile toward the pointer (max ~4°) and move its glare.
+    const tiltTile = (e: PointerEvent) => {
+      const t = (e.target as Element | null)?.closest<HTMLElement>(".tile");
+      if (t !== tile) resetTile();
+      if (!t) return;
+      tile = t;
+      const r = t.getBoundingClientRect();
+      const nx = (e.clientX - r.left) / r.width;
+      const ny = (e.clientY - r.top) / r.height;
+      t.style.setProperty("--rx", `${((0.5 - ny) * 5).toFixed(2)}deg`);
+      t.style.setProperty("--ry", `${((nx - 0.5) * 6).toFixed(2)}deg`);
+      t.style.setProperty("--gx", `${(nx * 100).toFixed(1)}%`);
+      t.style.setProperty("--gy", `${(ny * 100).toFixed(1)}%`);
+    };
 
     const paint = () => {
       frame = 0;
@@ -66,9 +88,11 @@ export function BenchFX() {
       py = e.pageY;
       lamp.dataset.on = "true";
       loupe.dataset.on = "true";
+      tiltTile(e);
       schedule();
     };
     const onPointerLeave = () => {
+      resetTile();
       lamp.dataset.on = "false";
       if (mode === "mouse") loupe.dataset.on = "false";
     };

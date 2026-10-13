@@ -1,26 +1,206 @@
 @import "tailwindcss";
 
+/*
+  The design bench. Tokens live here and in DESIGN.md; keep the two in sync.
+  One accent (brass). Status colours appear only inside sims.
+*/
+@theme {
+  --color-mat: #1d4b39;
+  --color-mat-deep: #163d2e;
+  --color-mat-shade: #10291f;
+  --color-surface: #133528;
+  --color-surface-raised: #17402f;
+  --color-ink: #f2efe6;
+  --color-sage: #a9bda4;
+  --color-sage-dim: #7f977b;
+  --color-line: rgb(242 239 230 / 0.14);
+  --color-line-strong: rgb(242 239 230 / 0.28);
+  --color-brass: #ddb06f;
+  --color-brass-deep: #b8874a;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Type scale (1.25 ratio, rem) */
+  --text-silk: 0.6875rem;
+  --text-silk--line-height: 1rem;
+  --text-silk--letter-spacing: 0.14em;
+
+  --ease-bench: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --shadow-rest:
+    0 1px 0 rgb(242 239 230 / 0.06) inset, 0 2px 3px rgb(5 18 12 / 0.35),
+    0 10px 24px -8px rgb(5 18 12 / 0.55);
+  --shadow-lift:
+    0 1px 0 rgb(242 239 230 / 0.08) inset, 0 4px 8px rgb(5 18 12 / 0.3),
+    0 28px 48px -12px rgb(5 18 12 / 0.65);
+}
+
+/* Bench grid: minor line every 12 px, major line every 10 units (120 px). */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --unit: 12px;
+  --major: 120px;
+  --lamp-x: 50vw;
+  --lamp-y: 30vh;
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-mat);
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100dvh;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  background-color: var(--color-mat);
+  background-image:
+    linear-gradient(to right, rgb(232 240 226 / 0.11) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(232 240 226 / 0.11) 1px, transparent 1px),
+    linear-gradient(to right, rgb(232 240 226 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(232 240 226 / 0.045) 1px, transparent 1px), url("/mat-noise.svg");
+  background-size:
+    var(--major) var(--major),
+    var(--major) var(--major),
+    var(--unit) var(--unit),
+    var(--unit) var(--unit),
+    240px 240px;
+  font-feature-settings: "ss01", "cv11";
+}
+
+::selection {
+  background: rgb(221 176 111 / 0.35);
+  color: var(--color-ink);
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+a,
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgb(221 176 111 / 0.18);
+}
+
+/* The tile title link stretches over the whole tile; draw its focus ring on the tile edge. */
+.tile-link:focus-visible {
+  outline: none;
+}
+.tile-link:focus-visible::after {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Ruler ticks along the top and left edges of the mat. */
+.mat-edges::before,
+.mat-edges::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  background-repeat: repeat-x;
+}
+.mat-edges::before {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background-image:
+    linear-gradient(to right, rgb(242 239 230 / 0.42) 1px, transparent 1px),
+    linear-gradient(to right, rgb(242 239 230 / 0.3) 1px, transparent 1px),
+    linear-gradient(to right, rgb(242 239 230 / 0.2) 1px, transparent 1px);
+  background-size:
+    var(--major) 14px,
+    calc(var(--major) / 2) 9px,
+    var(--unit) 5px;
+}
+.mat-edges::after {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 14px;
+  background-repeat: repeat-y;
+  background-image:
+    linear-gradient(to bottom, rgb(242 239 230 / 0.42) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(242 239 230 / 0.3) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(242 239 230 / 0.2) 1px, transparent 1px);
+  background-size:
+    14px var(--major),
+    9px calc(var(--major) / 2),
+    5px var(--unit);
+}
+
+/* Desk lamp: a soft lightening of the mat that follows the pointer. */
+.lamp {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 400ms var(--ease-bench);
+  background: radial-gradient(
+    560px circle at var(--lamp-x) var(--lamp-y),
+    rgb(255 248 222 / 0.06),
+    rgb(255 248 222 / 0.025) 40%,
+    transparent 70%
+  );
+}
+.lamp[data-on="true"] {
+  opacity: 1;
+}
+
+/* Fade-and-rise once on first view. Only hidden when JS is running. */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 300ms var(--ease-bench),
+    transform 300ms var(--ease-bench);
+}
+.js .reveal[data-in="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Project tile resting on the mat. */
+.tile {
+  transform: rotate(var(--tilt, 0deg));
+  box-shadow: var(--shadow-rest);
+  transition:
+    transform 240ms var(--ease-bench),
+    box-shadow 240ms var(--ease-bench);
+}
+@media (hover: hover) {
+  .tile:hover,
+  .tile:focus-within {
+    transform: translateY(-4px) rotate(0deg);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+  .tile,
+  .tile:hover {
+    transform: none;
+  }
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }

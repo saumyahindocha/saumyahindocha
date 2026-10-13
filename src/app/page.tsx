@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AngleGuides } from "@/components/bench/AngleGuides";
 import { DimensionLine } from "@/components/bench/DimensionLine";
+import { PhotoPrint } from "@/components/bench/PhotoPrint";
 import { PodPoster } from "@/components/bench/PodPoster";
 import { ProjectTile } from "@/components/bench/ProjectTile";
 import { Reveal } from "@/components/bench/Reveal";
@@ -25,7 +26,7 @@ export default function Home() {
 
 function Hero() {
   return (
-    <section className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pt-10 pb-8 sm:px-8 md:grid-cols-[1.1fr_1fr] md:pt-16 lg:pt-20">
+    <section className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pt-10 pb-8 sm:px-8 md:grid-cols-[1fr_1.2fr] md:pt-16 lg:pt-20">
       <AngleGuides className="absolute -top-16 -left-24 hidden w-[520px] md:block" />
       <div className="relative">
         <p className="font-mono text-sm text-brass">Mechanical Design &amp; Robotics</p>
@@ -55,8 +56,20 @@ function Hero() {
         </div>
       </div>
 
-      <figure className="relative mx-auto w-full max-w-[420px] md:max-w-none">
-        <PodPoster className="h-auto w-full" />
+      <figure className="relative mx-auto w-full max-w-[480px] md:max-w-none">
+        <div className="relative">
+          <PodPoster className="h-auto w-full" />
+          <PhotoPrint
+            src="/media/pod-pico-above-screen.webp"
+            alt="The Pod's Pico 2 W mounted above its 2.8 inch screen, held in a hand."
+            width={560}
+            height={1008}
+            caption="Pico 2 W over the screen"
+            tilt={5}
+            priority
+            className="absolute top-[14%] right-[1%] w-[31%]"
+          />
+        </div>
         <figcaption className="mt-2 text-center text-xs text-sage-dim">
           Pod, top view. An orbitable 3D model replaces this drawing in stage 3.
         </figcaption>
@@ -107,7 +120,7 @@ function Projects() {
           All projects
         </Link>
       </div>
-      <ul className="mt-10 grid gap-8 md:grid-cols-2 md:gap-x-10 md:gap-y-12">
+      <ul className="mt-10 grid items-start gap-8 md:grid-cols-2 md:gap-x-10 md:gap-y-12">
         {projects.map((p, i) => (
           <Reveal
             as="li"

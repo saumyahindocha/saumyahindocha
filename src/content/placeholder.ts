@@ -5,6 +5,10 @@ export type Status = "Built" | "In progress" | "Pilot-ready";
 
 export type Headline = { value: string; label: string };
 
+export type TileMedia =
+  | { kind: "photo"; src: string; width: number; height: number; alt: string }
+  | { kind: "drawing"; name: "cooling-tower" };
+
 export type ProjectTileData = {
   code: string;
   silk: string;
@@ -15,6 +19,7 @@ export type ProjectTileData = {
   status: Status;
   headlines: [Headline, Headline, Headline];
   tilt: number;
+  media: TileMedia;
 };
 
 export const projects: ProjectTileData[] = [
@@ -32,6 +37,13 @@ export const projects: ProjectTileData[] = [
       { value: "₹5.6–9.2k", label: "bill of materials" },
     ],
     tilt: -0.6,
+    media: {
+      kind: "photo",
+      src: "/media/nids-assembled.webp",
+      width: 900,
+      height: 794,
+      alt: "The NIDS robot on a bench: three acrylic plates on threaded rods, two wheels, motor driver and LiPo on top.",
+    },
   },
   {
     code: "SH-02",
@@ -47,6 +59,13 @@ export const projects: ProjectTileData[] = [
       { value: "52×109", label: "mm PCB, 2 layers" },
     ],
     tilt: 0.5,
+    media: {
+      kind: "photo",
+      src: "/media/pod-perfboard-underside.webp",
+      width: 800,
+      height: 957,
+      alt: "Underside of the Pod perfboard: solder bridges and red, yellow and black wire links.",
+    },
   },
   {
     code: "SH-03",
@@ -62,6 +81,13 @@ export const projects: ProjectTileData[] = [
       { value: "87+134+31", label: "tests passing" },
     ],
     tilt: 0.4,
+    media: {
+      kind: "photo",
+      src: "/media/parking-dashboard-live.webp",
+      width: 1100,
+      height: 650,
+      alt: "Station Parking dashboard, live view: vehicles inside, revenue, cash, review queue and movements per gate per hour.",
+    },
   },
   {
     code: "SH-04",
@@ -77,6 +103,7 @@ export const projects: ProjectTileData[] = [
       { value: "3.517 kW", label: "per ton of refrigeration" },
     ],
     tilt: -0.4,
+    media: { kind: "drawing", name: "cooling-tower" },
   },
 ];
 

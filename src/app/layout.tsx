@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Manrope } from "next/font/google";
-import { LampLight } from "@/components/bench/LampLight";
+import { BenchFX } from "@/components/bench/BenchFX";
 import { Nav } from "@/components/bench/Nav";
 import { Footer } from "@/components/bench/Footer";
 import "./globals.css";
@@ -43,7 +43,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           Skip to content
         </a>
         <div className="mat-edges relative min-h-dvh overflow-x-clip">
-          <LampLight />
+          <BenchFX />
           <Nav />
           <main id="main" className="relative z-10">
             {children}

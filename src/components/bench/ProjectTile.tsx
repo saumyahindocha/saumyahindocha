@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import type { ProjectTileData } from "@/content/placeholder";
+import type { ProjectTileData, TileMedia } from "@/content/placeholder";
+import { CoolingTowerDrawing } from "./CoolingTowerDrawing";
 import { Silk } from "./Silk";
 import { StatusChip } from "./StatusChip";
 import { SpecStrip } from "./SpecStrip";
@@ -30,6 +32,8 @@ export function ProjectTile({ project }: { project: ProjectTileData }) {
         <StatusChip status={project.status} />
       </header>
 
+      <TileWindow media={project.media} />
+
       <h3 className="mt-5 text-xl font-semibold tracking-tight text-ink sm:text-2xl">
         <Link href={href} className="tile-link after:absolute after:inset-0 after:rounded-md">
           {project.title}
@@ -57,5 +61,29 @@ export function ProjectTile({ project }: { project: ProjectTileData }) {
         </Link>
       </footer>
     </article>
+  );
+}
+
+/** The tile's picture: a photo inset like a print, or a line drawing on the tile. */
+function TileWindow({ media }: { media: TileMedia }) {
+  return (
+    <div className="relative mt-4 aspect-[16/10] overflow-hidden rounded-[3px] border border-line bg-mat-shade">
+      {media.kind === "photo" ? (
+        <Image
+          src={media.src}
+          alt={media.alt}
+          width={media.width}
+          height={media.height}
+          sizes="(min-width: 768px) 520px, 92vw"
+          className="size-full object-cover brightness-[0.88] saturate-[0.85] transition-[filter,transform] duration-300 group-hover:scale-[1.02] group-hover:brightness-100 group-hover:saturate-100"
+        />
+      ) : (
+        <CoolingTowerDrawing className="size-full p-3" />
+      )}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgb(242_239_230/0.06),inset_0_-40px_60px_-30px_rgb(5_18_12/0.6)]"
+      />
+    </div>
   );
 }

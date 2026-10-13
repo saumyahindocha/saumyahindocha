@@ -37,7 +37,8 @@ export type Project = {
   repo: string;
   links: { label: string; href: string }[];
   media: MediaItem[];
-  model: ModelKey;
+  /** Optional: a project without a model shows its tile cover instead. */
+  model?: ModelKey;
   lessons: string[];
   /** Tile: short designator, resting tilt in degrees, poster shown before 3D loads, three short numbers. */
   tile: { silk: string; tilt: number; cover: TileMedia; headline: Headline[] };
@@ -55,5 +56,5 @@ export type ProjectTileData = {
   headlines: Headline[];
   tilt: number;
   media: TileMedia;
-  model: ModelKey;
+  model?: ModelKey;
 };

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import type { ProjectTileData } from "@/lib/types";
+import { Cover } from "./Cover";
 import { ModelWindow } from "./ModelWindow";
 import { Silk } from "./Silk";
 import { StatusChip } from "./StatusChip";
@@ -53,12 +54,14 @@ export function ProjectTile({ project }: { project: ProjectTileData }) {
             >
               Open project
             </Link>
-            <Link
-              href={`${href}#model`}
-              className="text-sage transition-colors duration-200 hover:text-ink"
-            >
-              Try the model
-            </Link>
+            {project.model && (
+              <Link
+                href={`${href}#model`}
+                className="text-sage transition-colors duration-200 hover:text-ink"
+              >
+                Try the model
+              </Link>
+            )}
           </footer>
         </div>
       </div>
@@ -70,7 +73,11 @@ export function ProjectTile({ project }: { project: ProjectTileData }) {
 function TileWindow({ project }: { project: ProjectTileData }) {
   return (
     <div className="relative z-10 mt-4 aspect-[4/3] overflow-hidden rounded-[3px] border border-line bg-mat-shade/60">
-      <ModelWindow model={project.model} media={project.media} />
+      {project.model ? (
+        <ModelWindow model={project.model} media={project.media} />
+      ) : (
+        <Cover media={project.media} sizes="(min-width: 768px) 560px, 92vw" />
+      )}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgb(242_239_230/0.06)]"

@@ -210,8 +210,10 @@ that follows a mouse pointer. Off on touch devices and with `prefers-reduced-mot
 ## Motion
 
 - 150–300 ms with the bench ease. Animate only `transform` and `opacity`.
-- Content fades and rises 14 px once as it enters the viewport. Nothing loops in the page chrome.
-- No parallax, no scroll-jacking, no autoplaying sound. With reduced motion, reveals are instant,
+- Content below the fold fades and rises 32 px once as it enters (about 1 s, glide ease). Content
+  already on screen at load never waits. Nothing loops in the page chrome.
+- No parallax and no autoplaying sound. Mouse-wheel scrolling eases on desktop (Lenis, at my request);
+  touch scrolling is native. With reduced motion, reveals are instant,
   tiles do not move, sims start paused and the lamp is off.
 
 ## Do's and Don'ts

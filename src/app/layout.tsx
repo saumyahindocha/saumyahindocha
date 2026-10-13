@@ -4,6 +4,7 @@ import { BenchFX } from "@/components/bench/BenchFX";
 import { Nav } from "@/components/bench/Nav";
 import { Footer } from "@/components/bench/Footer";
 import { SmoothScroll } from "@/components/bench/SmoothScroll";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin"], display: "optional" });
@@ -14,7 +15,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://saumyahindocha.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Saumya Hindocha · Mechanical Design & Robotics",
     template: "%s · Saumya Hindocha",

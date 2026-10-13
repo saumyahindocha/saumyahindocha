@@ -11,6 +11,7 @@ import { ArchDiagram } from "@/components/sims/ArchDiagram";
 import { TowerLab } from "@/components/sims/TowerLab";
 import { PodLab } from "@/components/sims/PodLab";
 import type { ModelKey } from "@/lib/types";
+import { Cover } from "@/components/bench/Cover";
 import { ModelWindow } from "@/components/bench/ModelWindow";
 import { Silk } from "@/components/bench/Silk";
 import { SpecStrip } from "@/components/bench/SpecStrip";
@@ -140,15 +141,21 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       {/* 3. Model */}
       <section id="model" aria-labelledby="model-heading" className="mt-10">
         <h2 id="model-heading" className="sr-only">
-          Interactive model
+          {project.model ? "Interactive model" : "Picture"}
         </h2>
         <Reveal>
-          {LAB[project.model] ?? (
+          {(project.model && LAB[project.model]) ?? (
             <>
               <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-mat-shade/60 shadow-[var(--shadow-rest)] sm:aspect-[16/9]">
-                <ModelWindow model={project.model} media={project.tile.cover} />
+                {project.model ? (
+                  <ModelWindow model={project.model} media={project.tile.cover} />
+                ) : (
+                  <Cover media={project.tile.cover} sizes="(min-width: 1152px) 1088px, 92vw" />
+                )}
               </div>
-              <p className="mt-3 text-xs text-sage">A first look at the model.</p>
+              {project.model && (
+                <p className="mt-3 text-xs text-sage">A first look at the model.</p>
+              )}
             </>
           )}
         </Reveal>

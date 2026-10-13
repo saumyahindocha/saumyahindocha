@@ -20,7 +20,6 @@ const REQUIRED = [
   "tags",
   "areas",
   "repo",
-  "model",
   "lessons",
   "tile",
 ] as const;

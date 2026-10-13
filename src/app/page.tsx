@@ -107,10 +107,10 @@ function Projects() {
   );
 }
 
-// Placeholder until Saumya confirms the facts (year, team, what was built, result).
+// XLR8: first year confirmed by Saumya; team, build and result still to come.
 const competitions = [
-  { silk: "C1", title: "XLR8", detail: "Details to come." },
-  { silk: "C2", title: "Aeromodelling competitions", detail: "Details to come." },
+  { silk: "C1", title: "XLR8", when: "First year", detail: "More details to come." },
+  { silk: "C2", title: "Aeromodelling competitions", when: "", detail: "Details to come." },
 ];
 
 function Competitions() {
@@ -130,7 +130,10 @@ function Competitions() {
             className="relative rounded-md border border-dashed border-line-strong p-6"
           >
             <Silk>{c.silk}</Silk>
-            <h3 className="mt-3 text-xl font-semibold tracking-tight">{c.title}</h3>
+            <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+              <h3 className="text-xl font-semibold tracking-tight">{c.title}</h3>
+              {c.when && <span className="font-mono text-xs text-sage">{c.when}</span>}
+            </div>
             <p className="mt-2 text-[0.9375rem] leading-relaxed text-sage">{c.detail}</p>
           </Reveal>
         ))}
@@ -203,7 +206,8 @@ function Experience() {
               <h3 className="text-lg font-semibold">B.Tech Mechanical Engineering, IIT Bombay</h3>
               <span className="font-mono text-xs text-sage">expected 2029</span>
             </div>
-            <p className="mt-2 text-[0.9375rem] text-sage">Minor in Robotics</p>
+            <p className="mt-2 text-[0.9375rem] text-sage">Second year · Minor in Robotics</p>
+            <p className="mt-1 font-mono text-xs text-sage">JEE Advanced rank 1834</p>
           </div>
         </div>
       </Reveal>

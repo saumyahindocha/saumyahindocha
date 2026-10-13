@@ -24,7 +24,7 @@ const LAB: Partial<Record<ModelKey, React.ReactNode>> = {
   nids: (
     <>
       <NidsLab />
-      <p className="mt-4 max-w-[70ch] text-xs leading-relaxed text-sage-dim">
+      <p className="mt-4 max-w-[70ch] text-xs leading-relaxed text-sage">
         The sim runs the linear model from <code>matlab/balance_model.m</code> (report Table 6.1),
         stepped with fixed-step RK4 every 1 ms. Around it sit the firmware&apos;s PID form, its
         Kalman filter, a 9.1 V motor limit and the 35° fall cut-off. The IMU noise, the floor
@@ -40,7 +40,7 @@ const LAB: Partial<Record<ModelKey, React.ReactNode>> = {
   gate: (
     <>
       <GateLab />
-      <p className="mt-4 max-w-[70ch] text-xs leading-relaxed text-sage-dim">
+      <p className="mt-4 max-w-[70ch] text-xs leading-relaxed text-sage">
         The day is a port of the repo&apos;s own full-day simulator: 3,000 bikes, 40 % on monthly
         passes, a morning entry peak and an evening exit peak, 2 % of reads unreadable and 2 %
         misread, and a quarter of walk-in payments in cash. Charges come from a port of the
@@ -56,7 +56,7 @@ const LAB: Partial<Record<ModelKey, React.ReactNode>> = {
   tower: (
     <>
       <TowerLab />
-      <p className="mt-4 max-w-[70ch] text-xs leading-relaxed text-sage-dim">
+      <p className="mt-4 max-w-[70ch] text-xs leading-relaxed text-sage">
         A client-side port of the dashboard&apos;s backend: the sensor simulator and the analytics
         in <code>backend/server.py</code>, with tower CT-01&apos;s design values, its baseline of
         0.17 kW per TR + 4 kW, and the default ₹9/kWh tariff. Heat is ṁ·Cp·ΔT, effectiveness is
@@ -115,13 +115,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <p className="mt-5 max-w-[56ch] text-lg leading-relaxed text-sage">{project.summary}</p>
         </div>
         <dl className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 border-l border-line pl-5 text-sm">
-          <dt className="font-mono text-xs text-sage-dim">Dates</dt>
+          <dt className="font-mono text-xs text-sage">Dates</dt>
           <dd className="text-ink">{project.dates}</dd>
-          <dt className="font-mono text-xs text-sage-dim">Role</dt>
+          <dt className="font-mono text-xs text-sage">Role</dt>
           <dd className="text-ink">{project.role}</dd>
           {project.team.length > 0 && (
             <>
-              <dt className="font-mono text-xs text-sage-dim">Team</dt>
+              <dt className="font-mono text-xs text-sage">Team</dt>
               <dd className="text-sage">
                 <ul>
                   {project.team.map((t) => (
@@ -138,17 +138,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <SpecStrip items={project.headline} className="mt-10 border-y border-line py-5" />
 
       {/* 3. Model */}
-      <section id="model" aria-label="Interactive model" className="mt-10">
+      <section id="model" aria-labelledby="model-heading" className="mt-10">
+        <h2 id="model-heading" className="sr-only">
+          Interactive model
+        </h2>
         <Reveal>
           {LAB[project.model] ?? (
             <>
               <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-mat-shade/60 shadow-[var(--shadow-rest)] sm:aspect-[16/9]">
                 <ModelWindow model={project.model} media={project.tile.cover} />
               </div>
-              <p className="mt-3 text-xs text-sage-dim">
-                A first look at the model. The full interactive version, with controls and live
-                plots, is being built next.
-              </p>
+              <p className="mt-3 text-xs text-sage">A first look at the model.</p>
             </>
           )}
         </Reveal>
@@ -225,11 +225,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </div>
         <nav aria-label="More projects" className="mt-12 grid grid-cols-2 gap-6">
           <Link href={`/projects/${prev.slug}`} className="group">
-            <span className="font-mono text-xs text-sage-dim">Previous</span>
+            <span className="font-mono text-xs text-sage">Previous</span>
             <span className="mt-1 block text-ink group-hover:text-brass">{prev.title}</span>
           </Link>
           <Link href={`/projects/${next.slug}`} className="group text-right">
-            <span className="font-mono text-xs text-sage-dim">Next</span>
+            <span className="font-mono text-xs text-sage">Next</span>
             <span className="mt-1 block text-ink group-hover:text-brass">{next.title}</span>
           </Link>
         </nav>

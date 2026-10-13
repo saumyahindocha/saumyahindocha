@@ -247,7 +247,7 @@ export function ArchDiagram() {
         <h3 className="font-mono text-silk text-sage uppercase">{node.name}</h3>
         <p className="text-sm leading-relaxed text-ink">{node.what}</p>
         <p className="font-mono text-xs text-brass">{node.tech}</p>
-        <p className="pt-2 text-xs text-sage-dim">Pick a component to see what it does.</p>
+        <p className="pt-2 text-xs text-sage">Pick a component to see what it does.</p>
       </div>
     </div>
   );

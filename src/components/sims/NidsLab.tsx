@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { NidsPose } from "@/three/NidsScene";
 import { BotPoster } from "@/components/bench/BotPoster";
+import { useEngaged } from "@/lib/engaged";
 import {
   closedLoop,
   dcGain,
@@ -41,6 +42,8 @@ const fmtC = (re: number, im: number) =>
 export function NidsLab() {
   const { ref, seen, active } = useOnScreen<HTMLDivElement>();
   const env = useLabEnv();
+  const engaged = useEngaged();
+  const show3d = seen && engaged && env.gl;
   const simRef = useRef<NidsSim | null>(null);
   const pose = useRef<NidsPose>({ theta: 0, p: 0 });
   const thetaCanvas = useRef<HTMLCanvasElement>(null);
@@ -260,11 +263,11 @@ export function NidsLab() {
       <div className="relative">
         <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-mat-shade/60 shadow-[var(--shadow-rest)] sm:aspect-[16/9]">
           <div
-            className={`absolute inset-0 transition-opacity duration-500 ${seen && env.gl ? "opacity-0" : ""}`}
+            className={`absolute inset-0 transition-opacity duration-500 ${show3d ? "opacity-0" : ""}`}
           >
             <BotPoster className="size-full p-6" />
           </div>
-          {seen && env.gl && (
+          {show3d && (
             <div className="absolute inset-0" aria-hidden>
               <NidsScene
                 compact
@@ -344,7 +347,7 @@ export function NidsLab() {
               onChange={(v) => setGain("kd", v)}
               format={(v) => v.toFixed(1)}
             />
-            <p className="text-xs leading-snug text-sage-dim">
+            <p className="text-xs leading-snug text-sage">
               Brass ticks mark the gains from the 25 Jun MATLAB run: Kp 450.47, Ki 800.91, Kd 100.
             </p>
           </div>

@@ -102,7 +102,7 @@ function Projects() {
           </Reveal>
         ))}
       </ul>
-      <p className="mt-8 max-w-[70ch] text-xs leading-relaxed text-sage-dim">
+      <p className="mt-8 max-w-[70ch] text-xs leading-relaxed text-sage">
         * Measured on held-out computer-generated plates, not yet on real bikes.
       </p>
     </section>

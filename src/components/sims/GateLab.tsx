@@ -328,7 +328,7 @@ export function GateLab() {
             aria-label="Top-down view of two gates: bikes cross the camera line and their plate reads appear"
             className="block h-[25rem] w-full sm:h-[28rem]"
           />
-          <p className="border-t border-line px-3 py-2 font-mono text-[0.625rem] text-sage-dim">
+          <p className="border-t border-line px-3 py-2 font-mono text-[0.625rem] text-sage">
             Synthetic plates. Teal bikes hold monthly passes.
           </p>
           <div className="absolute top-3 right-3 flex gap-1.5">
@@ -368,7 +368,7 @@ export function GateLab() {
                 const read = c.dir === "IN" ? c.r.entryRead : c.r.exitRead;
                 return (
                   <li key={`${c.r.id}${c.dir}`} className="flex justify-between gap-2">
-                    <span className="text-sage-dim">{hhmm(c.t)}</span>
+                    <span className="text-sage">{hhmm(c.t)}</span>
                     <span className={read === "UNREAD" ? "text-[#f0a08c]" : "text-ink"}>
                       {read === "UNREAD" ? "review" : prettyPlate(c.r.plate)}
                     </span>
@@ -377,7 +377,7 @@ export function GateLab() {
                 );
               })}
             </ul>
-            <p className="mt-2 font-mono text-[0.625rem] text-sage-dim">
+            <p className="mt-2 font-mono text-[0.625rem] text-sage">
               {stats.review} reads in the review queue
             </p>
           </div>
@@ -387,7 +387,7 @@ export function GateLab() {
       <div className="rounded-md border border-line bg-surface/70 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="font-mono text-sm text-ink tabular-nums">
-            {hhmm(clock)} <span className="text-sage-dim">· time of day</span>
+            {hhmm(clock)} <span className="text-sage">· time of day</span>
           </p>
           <div className="flex items-center gap-1.5">
             {SPEEDS.map((s) => (
@@ -426,7 +426,7 @@ export function GateLab() {
             aria-valuetext={hhmm(clock)}
             className="bench-range mt-1 w-full"
           />
-          <div className="mt-1 flex justify-between font-mono text-[0.625rem] text-sage-dim">
+          <div className="mt-1 flex justify-between font-mono text-[0.625rem] text-sage">
             <span>05:00</span>
             <span>
               <span className="text-[#7fc8c0]">■</span> entries/h{" "}
@@ -457,7 +457,7 @@ function Stat({
       <p className="mt-1 font-mono text-lg tabular-nums" style={{ color: tone }}>
         {value}
       </p>
-      <p className="text-[0.6875rem] text-sage-dim">{sub}</p>
+      <p className="text-[0.6875rem] text-sage">{sub}</p>
     </div>
   );
 }

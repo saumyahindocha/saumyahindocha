@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useEngaged } from "@/lib/engaged";
 import { useLabEnv, useOnScreen } from "./controls";
 
 const PcbScene = dynamic(() => import("@/three/PcbScene").then((m) => m.PcbScene), {
@@ -12,7 +13,8 @@ const PcbScene = dynamic(() => import("@/three/PcbScene").then((m) => m.PcbScene
 export function RemotePcb() {
   const { ref, seen, active } = useOnScreen<HTMLDivElement>();
   const env = useLabEnv();
-  const show3d = seen && env.gl;
+  const engaged = useEngaged();
+  const show3d = seen && engaged && env.gl;
   return (
     <div className="grid gap-5 rounded-md border border-line bg-surface/70 p-4 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] md:items-center">
       <div

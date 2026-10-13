@@ -31,7 +31,7 @@ export function Slider({
         <span className="text-sage">{label}</span>
         <span className="font-mono text-ink tabular-nums">
           {format(value)}
-          {unit && <span className="text-sage-dim"> {unit}</span>}
+          {unit && <span className="text-sage"> {unit}</span>}
         </span>
       </span>
       <span className="relative mt-1.5 block">
@@ -72,7 +72,7 @@ export function Toggle({
     <label className="flex cursor-pointer items-start justify-between gap-4 py-2">
       <span className="min-w-0">
         <span className="block text-sm text-ink">{label}</span>
-        {hint && <span className="mt-0.5 block text-xs leading-snug text-sage-dim">{hint}</span>}
+        {hint && <span className="mt-0.5 block text-xs leading-snug text-sage">{hint}</span>}
       </span>
       <input
         type="checkbox"

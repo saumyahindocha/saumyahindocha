@@ -87,7 +87,7 @@ export default function ResumePage() {
               <span className="font-mono text-xs text-sage">{p.dates}</span>
             </div>
             <p className="mt-1 text-[0.9375rem] leading-relaxed text-sage">{p.summary}</p>
-            <p className="mt-1 font-mono text-xs text-sage-dim">
+            <p className="mt-1 font-mono text-xs text-sage">
               {p.headline
                 .slice(0, 3)
                 .map((h) => `${h.value} ${h.label}`)

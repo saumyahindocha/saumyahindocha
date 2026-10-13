@@ -218,17 +218,16 @@ button {
   opacity: 1;
 }
 
-/* Fade-and-rise once on first view. Only hidden when JS is running. */
-.js .reveal {
-  opacity: 0;
-  transform: translate3d(0, 32px, 0) scale(0.985);
+/* Fade-and-rise once on first view. Reveal marks only below-the-fold content as pending. */
+.reveal {
   transition:
     opacity 900ms var(--ease-glide),
     transform 1100ms var(--ease-glide);
 }
-.js .reveal[data-in="true"] {
-  opacity: 1;
-  transform: none;
+.reveal[data-pending="true"] {
+  opacity: 0;
+  transform: translate3d(0, 32px, 0) scale(0.985);
+  transition: none;
 }
 
 /* Project tile resting on the mat. Tilts toward the pointer in 3D; a soft glare follows it. */
@@ -338,10 +337,6 @@ button {
   }
   .tile,
   .tile:hover {
-    transform: none;
-  }
-  .js .reveal {
-    opacity: 1;
     transform: none;
   }
   .plot {

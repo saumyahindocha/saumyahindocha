@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { TowerDrive } from "@/three/TowerScene";
 import { CoolingTowerDrawing } from "@/components/bench/CoolingTowerDrawing";
+import { useEngaged } from "@/lib/engaged";
 import { mulberry } from "@/sims/gate/day";
 import {
   analyse,
@@ -39,6 +40,8 @@ const inr = (v: number) => `₹${Math.round(v).toLocaleString("en-IN")}`;
 export function TowerLab() {
   const { ref, seen, active } = useOnScreen<HTMLDivElement>();
   const env = useLabEnv();
+  const engaged = useEngaged();
+  const show3d = seen && engaged && env.gl;
   const [fouling, setFouling] = useState(0.35);
   const [tariff, setTariff] = useState(DEFAULT_TARIFF);
   const [step, setStep] = useState(0);
@@ -136,11 +139,11 @@ export function TowerLab() {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-mat-shade/60 shadow-[var(--shadow-rest)]">
           <div
-            className={`absolute inset-0 transition-opacity duration-500 ${seen && env.gl ? "opacity-0" : ""}`}
+            className={`absolute inset-0 transition-opacity duration-500 ${show3d ? "opacity-0" : ""}`}
           >
             <CoolingTowerDrawing className="size-full p-6" />
           </div>
-          {seen && env.gl && (
+          {show3d && (
             <div className="absolute inset-0" aria-hidden>
               <TowerScene
                 active={active}
@@ -175,7 +178,7 @@ export function TowerLab() {
                 <p className="font-mono text-[0.625rem] text-sage uppercase">{label}</p>
                 <p className="mt-1 font-mono text-lg text-ink tabular-nums">
                   {value}
-                  <span className="text-xs text-sage-dim"> {unit}</span>
+                  <span className="text-xs text-sage"> {unit}</span>
                 </p>
               </div>
             ))}
@@ -220,7 +223,7 @@ export function TowerLab() {
                   }}
                   className="w-16 rounded-[3px] border border-line-strong bg-mat-shade px-2 py-0.5 text-right tabular-nums"
                 />
-                <span className="text-sage-dim">/kWh</span>
+                <span className="text-sage">/kWh</span>
               </span>
             </label>
           </div>
@@ -244,7 +247,7 @@ export function TowerLab() {
           <p className="font-mono text-[0.625rem] text-sage uppercase">Power above baseline</p>
           <p className="font-mono text-2xl text-brass tabular-nums">
             {inr(a.rupeesPerHour * 24)}
-            <span className="text-sm text-sage-dim"> /day</span>
+            <span className="text-sm text-sage"> /day</span>
           </p>
           <p className="text-xs leading-snug text-sage">
             {a.excessKw.toFixed(1)} kW above the baseline at ₹{tariff}/kWh. Cleaning back to a fresh

@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { ModelKey, TileMedia } from "@/lib/types";
+import { useEngaged } from "@/lib/engaged";
 import type { NidsHandle } from "@/three/NidsScene";
 import { CoolingTowerDrawing } from "./CoolingTowerDrawing";
 
@@ -80,7 +81,8 @@ export function ModelWindow({ model, media }: { model: ModelKey; media: TileMedi
     return () => window.clearTimeout(t);
   }, [model, active, env.reduced]);
 
-  const show3d = seen && env.gl && view === "3d";
+  const engaged = useEngaged();
+  const show3d = seen && engaged && env.gl && view === "3d";
   const hasPhoto = media.kind === "photo";
 
   return (

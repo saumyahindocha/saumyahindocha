@@ -15,7 +15,7 @@ export function Gallery({ items }: { items: MediaItem[] }) {
                 preload="none"
                 playsInline
                 poster={m.src}
-                className="aspect-[4/3] w-full bg-mat-shade object-cover"
+                className="aspect-[4/3] w-full bg-mat-shade object-cover focus:outline-2 focus:outline-offset-2 focus:outline-brass"
                 aria-label={m.alt}
               >
                 <source src={m.video} type="video/mp4" />

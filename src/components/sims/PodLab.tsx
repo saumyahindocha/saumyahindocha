@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState } from "react";
 import { PodPoster } from "@/components/bench/PodPoster";
+import { useEngaged } from "@/lib/engaged";
 import { LabButton, Slider, useLabEnv, useOnScreen } from "./controls";
 import { SignalChain } from "./SignalChain";
 
@@ -15,7 +16,8 @@ export function PodLab() {
   const env = useLabEnv();
   const [explode, setExplode] = useState(0);
   const [focus, setFocus] = useState(false);
-  const show3d = seen && env.gl;
+  const engaged = useEngaged();
+  const show3d = seen && engaged && env.gl;
 
   return (
     <div className="space-y-4">
@@ -76,7 +78,7 @@ export function PodLab() {
             >
               {focus ? "Done" : "Use the screen"}
             </LabButton>
-            <p className="mt-2 text-xs leading-snug text-sage-dim">
+            <p className="mt-2 text-xs leading-snug text-sage">
               The screen runs the Pod&apos;s own display code, compiled for the browser: Home, the
               SD library and the Poster Now Playing screen with volume and seek. The album art is
               placeholder art.

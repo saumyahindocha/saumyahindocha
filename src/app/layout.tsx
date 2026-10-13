@@ -6,11 +6,11 @@ import { Footer } from "@/components/bench/Footer";
 import { SmoothScroll } from "@/components/bench/SmoothScroll";
 import "./globals.css";
 
-const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin"], display: "swap" });
+const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin"], display: "optional" });
 const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
-  display: "swap",
+  display: "optional",
 });
 
 export const metadata: Metadata = {
@@ -30,12 +30,6 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${manrope.variable} ${jetbrains.variable}`}>
-      <head>
-        {/* Lets reveal animations hide content only when JS will un-hide it. */}
-        <script
-          dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
-        />
-      </head>
       <body className="antialiased">
         <a
           href="#main"

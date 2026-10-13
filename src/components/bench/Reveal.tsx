@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
 
-/** Fades and rises its children once, the first time they scroll into view. */
+/**
+ * Fades and rises its children once, the first time they scroll into view.
+ * Only content that starts below the fold is hidden; anything already on screen
+ * at load paints straight away, so the reveal never delays the first paint.
+ */
 export function Reveal({
   children,
   as: Tag = "div",
@@ -16,14 +20,17 @@ export function Reveal({
 }) {
   const ref = useRef<HTMLElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (el.getBoundingClientRect().top < window.innerHeight) return;
+    el.dataset.pending = "true";
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           if (e.isIntersecting) {
-            el.dataset.in = "true";
+            delete el.dataset.pending;
             io.disconnect();
           }
         }

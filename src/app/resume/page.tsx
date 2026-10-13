@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Reveal } from "@/components/bench/Reveal";
 import { Silk } from "@/components/bench/Silk";
 import { getProjects } from "@/lib/projects";
 import { RESUME_PDF, resume, type ResumeEntry } from "@/lib/resume";
@@ -11,9 +12,11 @@ export const metadata: Metadata = {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="grid gap-4 border-t border-line py-8 md:grid-cols-[11rem_1fr]">
-      <h2 className="font-mono text-silk text-sage uppercase">{title}</h2>
-      <div className="space-y-6">{children}</div>
+    <section className="border-t border-line py-8">
+      <Reveal className="grid gap-4 md:grid-cols-[11rem_1fr]">
+        <h2 className="font-mono text-silk text-sage uppercase">{title}</h2>
+        <div className="space-y-6">{children}</div>
+      </Reveal>
     </section>
   );
 }

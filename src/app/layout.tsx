@@ -3,6 +3,7 @@ import { JetBrains_Mono, Manrope } from "next/font/google";
 import { BenchFX } from "@/components/bench/BenchFX";
 import { Nav } from "@/components/bench/Nav";
 import { Footer } from "@/components/bench/Footer";
+import { SmoothScroll } from "@/components/bench/SmoothScroll";
 import "./globals.css";
 
 const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin"], display: "swap" });
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </a>
         <div className="mat-edges relative min-h-dvh overflow-x-clip">
           <BenchFX />
+          <SmoothScroll />
           <Nav />
           <main id="main" className="relative z-10">
             {children}

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
 /*
   The design bench. Tokens live here and in DESIGN.md; keep the two in sync.
@@ -27,6 +28,8 @@
   --text-silk--letter-spacing: 0.14em;
 
   --ease-bench: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Long, soft settle for scroll reveals. */
+  --ease-glide: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Bench grid: minor line every 12 px, major line every 10 units (120 px). */
@@ -155,11 +158,11 @@ button {
 
 /*
   Loupe: a small patch of brighter grid under the pointer or finger.
-  Positioned in page coordinates; its background is offset so its lines sit
-  exactly on the mat's lines.
+  Fixed to the viewport; its background is offset by the scroll position so
+  its lines sit exactly on the mat's lines.
 */
 .loupe {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: calc(var(--r) * 2);
@@ -187,16 +190,13 @@ button {
   will-change: transform;
 }
 .loupe[data-mode="mouse"] {
-  --r: 120px;
+  --r: 76px;
 }
 .loupe[data-mode="touch"] {
   --r: 64px;
 }
 .loupe[data-on="true"] {
   opacity: 1;
-}
-.loupe[data-mode="mouse"][data-on="true"] {
-  opacity: 0.4;
 }
 
 /* Desk lamp: a soft lightening of the mat that follows the pointer. */
@@ -221,10 +221,10 @@ button {
 /* Fade-and-rise once on first view. Only hidden when JS is running. */
 .js .reveal {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translate3d(0, 32px, 0) scale(0.985);
   transition:
-    opacity 300ms var(--ease-bench),
-    transform 300ms var(--ease-bench);
+    opacity 900ms var(--ease-glide),
+    transform 1100ms var(--ease-glide);
 }
 .js .reveal[data-in="true"] {
   opacity: 1;

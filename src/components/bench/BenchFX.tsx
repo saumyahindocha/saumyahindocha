@@ -3,12 +3,13 @@
 import { useEffect, useRef } from "react";
 
 const MAJOR = 120; // keep in sync with --major in globals.css
-const LOUPE_R = { mouse: 120, touch: 64 } as const;
+const LOUPE_R = { mouse: 76, touch: 64 } as const;
+const FOLLOW_MS = 55; // how long the mouse glow takes to catch up (time constant)
 
 /**
  * The bench's light, in one place:
- * - Mouse: the desk lamp follows the pointer, a faint loupe brightens the grid
- *   under it, and tile shadows fall away from the lamp.
+ * - Mouse: a small circle of brighter grid lines glides after the cursor, the
+ *   desk lamp follows it, and tile shadows fall away from the lamp.
  * - Touch: a small circle of brighter grid lines appears under the finger and
  *   fades after it lifts.
  * The lamp and shadow movement are off with prefers-reduced-motion; the touch
@@ -27,10 +28,12 @@ export function BenchFX() {
 
     let frame = 0;
     let mode: "mouse" | "touch" = "mouse";
-    let cx = 0; // viewport coords
+    let cx = 0; // pointer, viewport coords
     let cy = 0;
-    let px = 0; // page coords
-    let py = 0;
+    let lx = 0; // where the glow is drawn, eased toward the pointer
+    let ly = 0;
+    let last = 0;
+    let fresh = true; // first sighting: jump straight to the pointer
     let fadeTimer = 0;
     let tile: HTMLElement | null = null;
 
@@ -55,23 +58,37 @@ export function BenchFX() {
       t.style.setProperty("--gy", `${(ny * 100).toFixed(1)}%`);
     };
 
-    const paint = () => {
+    const paint = (now: number) => {
       frame = 0;
+      if (mode === "mouse" && !fresh) {
+        const k = 1 - Math.exp(-Math.min(now - last, 64) / FOLLOW_MS);
+        lx += (cx - lx) * k;
+        ly += (cy - ly) * k;
+      } else {
+        lx = cx;
+        ly = cy;
+        fresh = false;
+      }
+      last = now;
       const r = LOUPE_R[mode];
-      const left = px - r;
-      const top = py - r;
+      const left = lx - r;
+      const top = ly - r;
       loupe.style.transform = `translate3d(${left}px, ${top}px, 0)`;
       // Offset the loupe's own grid so its lines land on the mat's lines.
-      const ox = -(((left % MAJOR) + MAJOR) % MAJOR);
-      const oy = -(((top % MAJOR) + MAJOR) % MAJOR);
+      const pl = left + window.scrollX;
+      const pt = top + window.scrollY;
+      const ox = -(((pl % MAJOR) + MAJOR) % MAJOR);
+      const oy = -(((pt % MAJOR) + MAJOR) % MAJOR);
       loupe.style.backgroundPosition = `0 0, ${ox}px ${oy}px, ${ox}px ${oy}px, ${ox}px ${oy}px, ${ox}px ${oy}px`;
       if (mode === "mouse") {
-        lamp.style.setProperty("--lamp-x", `${cx}px`);
-        lamp.style.setProperty("--lamp-y", `${cy}px`);
+        lamp.style.setProperty("--lamp-x", `${lx}px`);
+        lamp.style.setProperty("--lamp-y", `${ly}px`);
         const w = window.innerWidth;
         const h = window.innerHeight;
-        root.style.setProperty("--shx", `${((0.5 - cx / w) * 16).toFixed(1)}px`);
-        root.style.setProperty("--shy", `${((0.45 - cy / h) * 12).toFixed(1)}px`);
+        root.style.setProperty("--shx", `${((0.5 - lx / w) * 16).toFixed(1)}px`);
+        root.style.setProperty("--shy", `${((0.45 - ly / h) * 12).toFixed(1)}px`);
+        // Keep gliding until the glow has caught up with the cursor.
+        if (Math.abs(cx - lx) + Math.abs(cy - ly) > 0.3) schedule();
       }
     };
     const schedule = () => {
@@ -82,10 +99,9 @@ export function BenchFX() {
       if (e.pointerType !== "mouse" || reduced.matches) return;
       mode = "mouse";
       loupe.dataset.mode = "mouse";
+      if (loupe.dataset.on !== "true") fresh = true;
       cx = e.clientX;
       cy = e.clientY;
-      px = e.pageX;
-      py = e.pageY;
       lamp.dataset.on = "true";
       loupe.dataset.on = "true";
       tiltTile(e);
@@ -104,8 +120,8 @@ export function BenchFX() {
       mode = "touch";
       loupe.dataset.mode = "touch";
       lamp.dataset.on = "false";
-      px = t.pageX;
-      py = t.pageY;
+      cx = t.clientX;
+      cy = t.clientY;
       loupe.dataset.on = "true";
       schedule();
     };
@@ -115,7 +131,13 @@ export function BenchFX() {
       fadeTimer = window.setTimeout(() => (loupe.dataset.on = "false"), 450);
     };
 
+    // The glow sits in the viewport, so scrolling only re-aligns its grid.
+    const onScroll = () => {
+      if (loupe.dataset.on === "true") schedule();
+    };
+
     window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     root.addEventListener("pointerleave", onPointerLeave);
     window.addEventListener("touchstart", onTouch, { passive: true });
     window.addEventListener("touchmove", onTouch, { passive: true });
@@ -126,6 +148,7 @@ export function BenchFX() {
       cancelAnimationFrame(frame);
       window.clearTimeout(fadeTimer);
       window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("scroll", onScroll);
       root.removeEventListener("pointerleave", onPointerLeave);
       window.removeEventListener("touchstart", onTouch);
       window.removeEventListener("touchmove", onTouch);

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { Gallery } from "@/components/bench/Gallery";
+import { Reveal } from "@/components/bench/Reveal";
 import { ModelWindow } from "@/components/bench/ModelWindow";
 import { Silk } from "@/components/bench/Silk";
 import { SpecStrip } from "@/components/bench/SpecStrip";
@@ -81,13 +82,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
       {/* 3. Model */}
       <section id="model" aria-label="Interactive model" className="mt-10">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-mat-shade/60 shadow-[var(--shadow-rest)] sm:aspect-[16/9]">
-          <ModelWindow model={project.model} media={project.tile.cover} />
-        </div>
-        <p className="mt-3 text-xs text-sage-dim">
-          A first look at the model. The full interactive version, with controls and live plots, is
-          being built next.
-        </p>
+        <Reveal>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-mat-shade/60 shadow-[var(--shadow-rest)] sm:aspect-[16/9]">
+            <ModelWindow model={project.model} media={project.tile.cover} />
+          </div>
+          <p className="mt-3 text-xs text-sage-dim">
+            A first look at the model. The full interactive version, with controls and live plots,
+            is being built next.
+          </p>
+        </Reveal>
       </section>
 
       {/* 4–8. Write-up */}
@@ -106,23 +109,25 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div className="max-w-[70ch]">
           {body.map((s) => (
             <section key={s.id} aria-labelledby={s.id} className="mb-14">
-              <h2 id={s.id} className="text-2xl font-semibold tracking-tight">
-                {s.heading}
-              </h2>
-              <div className="prose-bench mt-4">
-                <MDXRemote source={s.content} />
-              </div>
-              {s.id === "the-build" && <Gallery items={project.media} />}
-              {s.id === "what-i-took-away" && (
-                <ol className="mt-6 space-y-4">
-                  {project.lessons.map((l, n) => (
-                    <li key={l} className="flex gap-4">
-                      <span className="font-mono text-sm text-brass">0{n + 1}</span>
-                      <span className="leading-relaxed text-ink">{l}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
+              <Reveal>
+                <h2 id={s.id} className="text-2xl font-semibold tracking-tight">
+                  {s.heading}
+                </h2>
+                <div className="prose-bench mt-4">
+                  <MDXRemote source={s.content} />
+                </div>
+                {s.id === "the-build" && <Gallery items={project.media} />}
+                {s.id === "what-i-took-away" && (
+                  <ol className="mt-6 space-y-4">
+                    {project.lessons.map((l, n) => (
+                      <li key={l} className="flex gap-4">
+                        <span className="font-mono text-sm text-brass">0{n + 1}</span>
+                        <span className="leading-relaxed text-ink">{l}</span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </Reveal>
             </section>
           ))}
         </div>

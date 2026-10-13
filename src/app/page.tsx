@@ -97,7 +97,7 @@ function Projects() {
       {/* Every project gets a live model and close to the same space; NIDS is a touch wider. */}
       <ul className="mt-10 grid gap-8 md:grid-cols-12 md:gap-10">
         {projects.map((p, i) => (
-          <Reveal as="li" key={p.code} delay={(i % 2) * 80} className={SPAN[i] ?? "md:col-span-6"}>
+          <Reveal as="li" key={p.code} delay={(i % 2) * 140} className={SPAN[i] ?? "md:col-span-6"}>
             <ProjectTile project={p} />
           </Reveal>
         ))}
@@ -133,7 +133,7 @@ function Competitions() {
           <Reveal
             as="li"
             key={c.title}
-            delay={i * 80}
+            delay={i * 120}
             className="relative rounded-md border border-line bg-surface/60 p-6"
           >
             <Silk>{c.silk}</Silk>

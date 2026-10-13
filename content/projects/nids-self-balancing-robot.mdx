@@ -122,7 +122,7 @@ The control design follows a linearised Euler-Lagrange model of an inverted pend
 - **Drive:** 100 mm wheels, with the LiPo powering the motors and USB powering the logic.
 - **Bench tests:** one sketch per subsystem (IMU, IR, L298N, dead zone, motor direction, NRF link) before any balancing code.
 
-The first design also had IR line following and a handheld NRF24L01 remote with an IR/manual mode switch. I designed the remote's PCB in EasyEDA in May 2026: an Arduino Nano, a KY-023 joystick and an NRF24L01+PA+LNA on 9 V, in a pistol-grip enclosure designed in Fusion 360 and 3D-printed in June. The mentor verified the board, but it was never fabricated; we built the same circuit on perfboard instead. On 18 Aug we shelved both the remote and line following to focus on balance. Their code is archived in the repo.
+The first design also had IR line following and a handheld NRF24L01 remote with an IR/manual mode switch. I designed the remote's PCB in EasyEDA in May 2026: an Arduino Nano, a KY-023 joystick and an NRF24L01+PA+LNA on 9 V, in a pistol-grip enclosure that I designed in Fusion 360 and 3D-printed in June. The mentor verified the board, but it was never fabricated; we built the same circuit on perfboard instead. On 18 Aug we shelved both the remote and line following to focus on balance. Their code is archived in the repo.
 
 After that, the robot balanced unassisted for about 50 seconds on video, and we exhibited it at the ITSP 2026 showcase. The gains used for that run were not recorded, so `firmware/balance` still holds the starting values from the tuning guide.
 

@@ -103,6 +103,8 @@ The main firmware is C on the Pico SDK with BTstack. A home screen picks the sou
 
 The "Poster" Now Playing screen draws on the second core, so core 0 keeps Bluetooth and audio. Every push runs a GitHub Actions build that publishes the `.uf2` files, which I flash by drag-and-drop. I write much of this firmware with AI coding agents and review it; the hardware choices, wiring and testing are mine.
 
+The screen on the model at the top of this page runs the Pod's own display code, compiled for the browser. Tap "Use screen" and it behaves like the device: pick Phone or SD card, open a folder, play a track, drag the seek bar, tap the art for the volume slider. The library, songs and album art are made-up placeholders.
+
 ## The build
 
 The story so far, from the dated build log:
@@ -112,7 +114,7 @@ The story so far, from the dated build log:
 3. **PCB Rev A (7 to 8 Oct).** The first plan was a bare RP2350A with a separate radio on a 4-layer board. I switched to soldering my Pico 2 W onto the board instead, which removed the chip, flash, crystal and regulator design and allowed 2 layers. I drew it in EasyEDA Pro: four schematic sheets, a 52 × 109 mm board, GND pours on both layers and a 9 × 14 mm antenna cut-out. DRC was clean apart from the expected notch item, and I exported the Gerbers, a 23-line BOM and pick-and-place.
 4. **Perfboard (8 to 10 Oct).** The JLCPCB quote for the assembled board was about $90, too much for one prototype, so the PCB design stays in the repo and I built the same layout on perfboard. I soldered it in one night, and the firmware now boots to the home screen with touch working, powered over USB.
 
-Still to do: SD playback and phone streaming on the perfboard, and the TP4056 charger, switch and battery, which have not been fitted yet. The album-art firmware compiles and renders on a PC, but its hardware test is still pending in the log.
+Still to do: SD playback and phone streaming on the perfboard, and the TP4056 charger, switch and battery, which have not been fitted yet. Album art over Bluetooth now works on the real hardware.
 
 ## What broke and how I fixed it
 

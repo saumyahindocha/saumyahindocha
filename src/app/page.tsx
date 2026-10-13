@@ -109,10 +109,15 @@ function Projects() {
   );
 }
 
-// XLR8: first year confirmed by Saumya; team, build and result still to come.
+// From Saumya, 13 Oct 2026.
 const competitions = [
-  { silk: "C1", title: "XLR8", when: "First year", detail: "More details to come." },
-  { silk: "C2", title: "Aeromodelling competitions", when: "", detail: "Details to come." },
+  {
+    silk: "C1",
+    title: "XLR8",
+    when: "First year",
+    detail: "Built a four-wheeled wireless line-following robot in a team.",
+  },
+  { silk: "C2", title: "Aeromodelling", when: "", detail: "Built a basic Depron foam plane." },
 ];
 
 function Competitions() {
@@ -129,7 +134,7 @@ function Competitions() {
             as="li"
             key={c.title}
             delay={i * 80}
-            className="relative rounded-md border border-dashed border-line-strong p-6"
+            className="relative rounded-md border border-line bg-surface/60 p-6"
           >
             <Silk>{c.silk}</Silk>
             <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">

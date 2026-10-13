@@ -1,6 +1,6 @@
 "use client";
 
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import {
   ContactShadows,
   Environment,
@@ -10,7 +10,9 @@ import {
   RoundedBox,
   useTexture,
 } from "@react-three/drei";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { PodEngine, POD_H, POD_W } from "@/pod/podEngine";
 import * as THREE from "three";
 
 /*
@@ -18,7 +20,8 @@ import * as THREE from "three";
   with the Pico 2 W in a 23 mm strip at the top, the 2.8" 240×320 screen module below it facing
   down onto the board, the PCM5102 DAC near the jack at the bottom right, and a 503450
   (5 × 34 × 50 mm) 1000 mAh LiPo on the underside, planned. Scene units: 1 = 10 mm.
-  Tap or click to explode it into layers. The screen shows the "Poster" Now Playing design.
+  Tap or click the case to explode it into layers. The screen is live: it runs the firmware's
+  own display code (src/pod/podEngine.ts), so it can be tapped and dragged like the real Pod.
 */
 
 const shell = new THREE.MeshStandardMaterial({
@@ -48,7 +51,29 @@ const LAYERS = {
   shell: [-0.2, -2.2],
 } as const;
 
-export function PodScene({ active, reducedMotion }: { active: boolean; reducedMotion: boolean }) {
+// Screen-module active area, in scene units (43.2 × 57.6 mm), and where it sits on its layer.
+const SCREEN_W = 4.32;
+const SCREEN_H = 5.76;
+const SCREEN_Y = -1.0;
+// Scratch objects for pointer maths, reused every event.
+const plane = new THREE.Plane();
+const hit = new THREE.Vector3();
+const normal = new THREE.Vector3();
+const origin = new THREE.Vector3();
+// Close enough that the screen fills most of the frame, a little high to clear the buttons.
+const FOCUS_CAM = new THREE.Vector3(0, SCREEN_Y - 0.35, 13.6);
+const FOCUS_TARGET = new THREE.Vector3(0, SCREEN_Y - 0.35, 0.97);
+
+export function PodScene({
+  active,
+  reducedMotion,
+  focus = false,
+}: {
+  active: boolean;
+  reducedMotion: boolean;
+  /** Face the screen and hand all pointer input to it. */
+  focus?: boolean;
+}) {
   return (
     <Canvas
       dpr={[1, 1.5]}
@@ -69,7 +94,7 @@ export function PodScene({ active, reducedMotion }: { active: boolean; reducedMo
           color="#9fd3b8"
         />
       </Environment>
-      <Pod reducedMotion={reducedMotion} />
+      <Pod reducedMotion={reducedMotion} focus={focus} />
       <ContactShadows
         position={[0, -6.2, 0]}
         opacity={0.5}
@@ -78,20 +103,21 @@ export function PodScene({ active, reducedMotion }: { active: boolean; reducedMo
         far={8}
         color="#04140d"
       />
-      <OrbitControls
-        target={[0, 0, 0.5]}
-        enablePan={false}
-        enableZoom={false}
-        autoRotate={!reducedMotion}
-        autoRotateSpeed={0.7}
-        enableDamping
-      />
     </Canvas>
   );
 }
 
-function Pod({ reducedMotion }: { reducedMotion: boolean }) {
-  const [exploded, setExploded] = useState(false);
+function Pod({ reducedMotion, focus }: { reducedMotion: boolean; focus: boolean }) {
+  const controls = useRef<OrbitControlsImpl>(null);
+  const [explodedState, setExploded] = useState(false);
+  const exploded = explodedState && !focus;
+  const group = useRef<THREE.Group>(null);
+  const screen = useRef<THREE.Mesh>(null);
+  const engine = useRef<PodEngine | null>(null);
+  const live = useRef<THREE.CanvasTexture | null>(null);
+  const screenMat = useRef<THREE.MeshBasicMaterial>(null);
+  const pressing = useRef(false);
+  const camera = useThree((st) => st.camera);
   const k = useRef(0);
   const bezelRef = useRef<THREE.Group>(null);
   const screenRef = useRef<THREE.Group>(null);
@@ -102,7 +128,42 @@ function Pod({ reducedMotion }: { reducedMotion: boolean }) {
     t.colorSpace = THREE.SRGBColorSpace;
   });
 
+  // Boot the real screen code once the model is on screen.
+  useEffect(() => {
+    let tex: THREE.CanvasTexture | null = null;
+    let gone = false;
+    PodEngine.create()
+      .then((e) => {
+        if (gone) return;
+        engine.current = e;
+        e.frame(performance.now());
+        tex = new THREE.CanvasTexture(e.canvas);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = 4;
+        live.current = tex;
+        if (screenMat.current) {
+          screenMat.current.map = tex;
+          screenMat.current.needsUpdate = true;
+        }
+      })
+      .catch(() => {}); // no wasm: the static Poster screen stays
+    return () => {
+      gone = true;
+      tex?.dispose();
+    };
+  }, []);
+
   useFrame((_, dt) => {
+    if (engine.current?.frame(performance.now()) && live.current) live.current.needsUpdate = true;
+
+    // Focus: turn the Pod to face the camera, close enough to use the screen.
+    if (focus && group.current) {
+      group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, 0, 6, dt);
+      camera.position.lerp(FOCUS_CAM, 1 - Math.exp(-6 * dt));
+      controls.current?.target.lerp(FOCUS_TARGET, 1 - Math.exp(-6 * dt));
+      camera.lookAt(controls.current?.target ?? FOCUS_TARGET);
+    }
+
     const target = exploded ? 1 : 0;
     k.current = reducedMotion ? target : THREE.MathUtils.damp(k.current, target, 6, dt);
     const layers = [
@@ -120,97 +181,163 @@ function Pod({ reducedMotion }: { reducedMotion: boolean }) {
 
   const toggle = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
-    setExploded((v) => !v);
+    if (!focus) setExploded((v) => !v);
+  };
+
+  // Pointer → screen pixels: intersect the pointer ray with the screen's plane (works while
+  // dragging off the edge too), then map local coordinates to the 240 × 320 panel.
+  const toPixels = (e: ThreeEvent<PointerEvent>) => {
+    const m = screen.current;
+    if (!m) return null;
+    m.updateWorldMatrix(true, false);
+    normal.set(0, 0, 1).transformDirection(m.matrixWorld);
+    plane.setFromNormalAndCoplanarPoint(normal, origin.setFromMatrixPosition(m.matrixWorld));
+    if (!e.ray.intersectPlane(plane, hit)) return null;
+    const p = m.worldToLocal(hit.clone());
+    return { x: (p.x / SCREEN_W + 0.5) * POD_W, y: (0.5 - p.y / SCREEN_H) * POD_H };
+  };
+  const press = (e: ThreeEvent<PointerEvent>) => {
+    if (!engine.current) return;
+    e.stopPropagation();
+    const px = toPixels(e);
+    if (!px) return;
+    pressing.current = true;
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+    if (controls.current) {
+      controls.current.enabled = false;
+      controls.current.autoRotate = false; // stop turning once someone is using it
+    }
+    engine.current.touch(px.x, px.y, true);
+  };
+  const drag = (e: ThreeEvent<PointerEvent>) => {
+    if (!pressing.current || !engine.current) return;
+    e.stopPropagation();
+    const px = toPixels(e);
+    if (px) engine.current.touch(px.x, px.y, true);
+  };
+  const lift = (e: ThreeEvent<PointerEvent>) => {
+    if (!pressing.current || !engine.current) return;
+    e.stopPropagation();
+    pressing.current = false;
+    (e.target as Element).releasePointerCapture?.(e.pointerId);
+    engine.current.touch(0, 0, false);
+    if (controls.current) controls.current.enabled = !focus;
   };
 
   return (
-    <group onClick={toggle} rotation={[0, -0.35, 0]}>
-      {/* Front bezel: a frame around the screen */}
-      <group ref={bezelRef}>
-        {/* Frame pieces around the 43.2 × 57.6 mm active area (centre y = -1.0) */}
-        {[
-          [0, 3.82, 5.7, 3.86],
-          [0, -4.82, 5.7, 1.86],
-          [-2.53, -1.0, 0.64, 5.78],
-          [2.53, -1.0, 0.64, 5.78],
-        ].map(([x, y, w, h]) => (
-          <mesh key={`${x}${y}`} material={frame} position={[x, y, 0]}>
-            <boxGeometry args={[w, h, 0.15]} />
-          </mesh>
-        ))}
-        {exploded && <Label at={[-4.0, 3.6, 0]} text="front bezel" left />}
-      </group>
-
-      {/* Screen module: red PCB, 2.8" panel showing the Poster Now Playing screen */}
-      <group ref={screenRef}>
-        <mesh material={redPcb} position={[0, -1.2, -0.1]}>
-          <boxGeometry args={[5.0, 8.6, 0.12]} />
-        </mesh>
-        <mesh position={[0, -1.0, 0.02]}>
-          <planeGeometry args={[4.32, 5.76]} />
-          <meshBasicMaterial map={art} toneMapped={false} />
-        </mesh>
-        {exploded && <Label at={[3.2, 0.6, 0]} text={'2.8" 240×320 touch screen'} />}
-      </group>
-
-      {/* Perfboard with the Pico 2 W in the top strip and the DAC near the bottom */}
-      <group ref={boardRef}>
-        <mesh material={perf}>
-          <boxGeometry args={[5.2, 10.9, 0.16]} />
-        </mesh>
-        <group position={[0, 4.3, 0.15]}>
-          <mesh material={pico}>
-            <boxGeometry args={[5.1, 2.1, 0.1]} />
-          </mesh>
-          <mesh material={silver} position={[1.6, 0, 0.1]}>
-            <boxGeometry args={[1.1, 1.0, 0.12]} />
-          </mesh>
-          <mesh material={bezel} position={[-0.3, 0, 0.09]}>
-            <boxGeometry args={[0.7, 0.7, 0.08]} />
-          </mesh>
-          <mesh material={silver} position={[-2.45, 0, 0.1]}>
-            <boxGeometry args={[0.5, 0.75, 0.25]} />
-          </mesh>
+    <>
+      <OrbitControls
+        ref={controls}
+        target={[0, 0, 0.5]}
+        enablePan={false}
+        enableZoom={false}
+        enabled={!focus}
+        autoRotate={!reducedMotion && !focus}
+        autoRotateSpeed={0.7}
+        enableDamping
+      />
+      <group ref={group} onClick={toggle} rotation={[0, -0.35, 0]}>
+        {/* Front bezel: a frame around the screen */}
+        <group ref={bezelRef}>
+          {/* Frame pieces around the 43.2 × 57.6 mm active area (centre y = -1.0) */}
+          {[
+            [0, 3.82, 5.7, 3.86],
+            [0, -4.82, 5.7, 1.86],
+            [-2.49, -1.0, 0.72, 5.78],
+            [2.49, -1.0, 0.72, 5.78],
+          ].map(([x, y, w, h]) => (
+            <mesh key={`${x}${y}`} material={frame} position={[x, y, 0]}>
+              <boxGeometry args={[w, h, 0.15]} />
+            </mesh>
+          ))}
+          {exploded && <Label at={[-4.0, 3.6, 0]} text="front bezel" left />}
         </group>
-        <group position={[1.3, -4.1, 0.15]}>
-          <mesh material={purple}>
-            <boxGeometry args={[1.8, 1.4, 0.1]} />
+
+        {/* Screen module: red PCB, 2.8" panel showing the Poster Now Playing screen */}
+        <group ref={screenRef}>
+          <mesh material={redPcb} position={[0, -1.2, -0.1]}>
+            <boxGeometry args={[5.0, 8.6, 0.12]} />
           </mesh>
-          <mesh material={bezel} position={[0.4, -0.75, 0.25]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.3, 0.3, 0.6, 16]} />
+          <mesh
+            ref={screen}
+            position={[0, SCREEN_Y, 0.02]}
+            onPointerDown={press}
+            onPointerMove={drag}
+            onPointerUp={lift}
+            onPointerCancel={lift}
+            onClick={(e) => e.stopPropagation()}
+            onPointerOver={() => {
+              if (engine.current) document.body.style.cursor = "pointer";
+            }}
+            onPointerOut={() => {
+              document.body.style.cursor = "";
+            }}
+          >
+            <planeGeometry args={[SCREEN_W, SCREEN_H]} />
+            <meshBasicMaterial ref={screenMat} map={art} toneMapped={false} />
           </mesh>
+          {exploded && <Label at={[3.2, 0.6, 0]} text={'2.8" 240×320 touch screen'} />}
         </group>
-        {exploded && (
-          <>
-            <Label at={[3.4, 4.3, 0]} text="Pico 2 W" />
-            <Label at={[3.4, -4.1, 0]} text="PCM5102 DAC" />
-          </>
-        )}
-      </group>
 
-      {/* 503450 LiPo on the underside */}
-      <group ref={batteryRef}>
-        <RoundedBox
-          args={[3.4, 5.0, 0.5]}
-          radius={0.12}
-          material={lipoMat}
-          position={[0, -1.6, 0]}
-        />
-        {exploded && <Label at={[-3.8, -1.2, 0]} text="1000 mAh LiPo (planned)" left />}
-      </group>
+        {/* Perfboard with the Pico 2 W in the top strip and the DAC near the bottom */}
+        <group ref={boardRef}>
+          <mesh material={perf}>
+            <boxGeometry args={[5.2, 10.9, 0.16]} />
+          </mesh>
+          <group position={[0, 4.3, 0.15]}>
+            <mesh material={pico}>
+              <boxGeometry args={[5.1, 2.1, 0.1]} />
+            </mesh>
+            <mesh material={silver} position={[1.6, 0, 0.1]}>
+              <boxGeometry args={[1.1, 1.0, 0.12]} />
+            </mesh>
+            <mesh material={bezel} position={[-0.3, 0, 0.09]}>
+              <boxGeometry args={[0.7, 0.7, 0.08]} />
+            </mesh>
+            <mesh material={silver} position={[-2.45, 0, 0.1]}>
+              <boxGeometry args={[0.5, 0.75, 0.25]} />
+            </mesh>
+          </group>
+          <group position={[1.3, -4.1, 0.15]}>
+            <mesh material={purple}>
+              <boxGeometry args={[1.8, 1.4, 0.1]} />
+            </mesh>
+            <mesh material={bezel} position={[0.4, -0.75, 0.25]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.3, 0.3, 0.6, 16]} />
+            </mesh>
+          </group>
+          {exploded && (
+            <>
+              <Label at={[3.4, 4.3, 0]} text="Pico 2 W" />
+              <Label at={[3.4, -4.1, 0]} text="PCM5102 DAC" />
+            </>
+          )}
+        </group>
 
-      {/* Back shell */}
-      <group ref={shellRef}>
-        <RoundedBox
-          args={[5.7, 11.5, 1.9]}
-          radius={0.5}
-          smoothness={4}
-          material={shell}
-          position={[0, 0, -0.1]}
-        />
-        {exploded && <Label at={[-4.0, -5.8, 0]} text="57 × 115 × 24 mm" left />}
+        {/* 503450 LiPo on the underside */}
+        <group ref={batteryRef}>
+          <RoundedBox
+            args={[3.4, 5.0, 0.5]}
+            radius={0.12}
+            material={lipoMat}
+            position={[0, -1.6, 0]}
+          />
+          {exploded && <Label at={[-3.8, -1.2, 0]} text="1000 mAh LiPo (planned)" left />}
+        </group>
+
+        {/* Back shell */}
+        <group ref={shellRef}>
+          <RoundedBox
+            args={[5.7, 11.5, 1.9]}
+            radius={0.5}
+            smoothness={4}
+            material={shell}
+            position={[0, 0, -0.1]}
+          />
+          {exploded && <Label at={[-4.0, -5.8, 0]} text="57 × 115 × 24 mm" left />}
+        </group>
       </group>
-    </group>
+    </>
   );
 }
 

@@ -22,15 +22,16 @@ const TowerScene = dynamic(() => import("@/three/TowerScene").then((m) => m.Towe
 // Touch users can't orbit (dragging scrolls the page), so their hint only names the tap.
 const HINT: Record<ModelKey, string> = {
   nids: "drag to orbit · click to push",
-  pod: "drag to orbit · click to explode",
+  pod: "tap the screen to use it · click the case to explode",
   gate: "live gate, synthetic plates",
   tower: "hot water in, cold water out",
 };
 const HINT_TOUCH: Record<ModelKey, string> = {
   ...HINT,
   nids: "tap the bot to push it",
-  pod: "tap to explode",
+  pod: "tap the case to explode",
 };
+const HINT_POD_FOCUS = "Pod's own screen code";
 
 /**
  * A tile's picture window: a 3D model by default, with a switch to the real build photo.
@@ -43,6 +44,7 @@ export function ModelWindow({ model, media }: { model: ModelKey; media: TileMedi
   const [active, setActive] = useState(false);
   const [env, setEnv] = useState({ reduced: false, fine: true, gl: true });
   const [view, setView] = useState<"3d" | "photo">("3d");
+  const [podFocus, setPodFocus] = useState(false);
   const pushed = useRef(false);
 
   useEffect(() => {
@@ -102,7 +104,10 @@ export function ModelWindow({ model, media }: { model: ModelKey; media: TileMedi
       </div>
 
       {show3d && (
-        <div className="absolute inset-0" aria-hidden>
+        <div
+          className={`absolute inset-0 ${model === "pod" && podFocus ? "[&_canvas]:!touch-none" : ""}`}
+          aria-hidden
+        >
           {model === "nids" && (
             <NidsScene
               ref={nids}
@@ -112,17 +117,23 @@ export function ModelWindow({ model, media }: { model: ModelKey; media: TileMedi
               reducedMotion={env.reduced}
             />
           )}
-          {model === "pod" && <PodScene active={active} reducedMotion={env.reduced} />}
+          {model === "pod" && (
+            <PodScene active={active} reducedMotion={env.reduced} focus={podFocus} />
+          )}
           {model === "gate" && <GateScene active={active} reducedMotion={env.reduced} />}
           {model === "tower" && <TowerScene active={active} reducedMotion={env.reduced} />}
         </div>
       )}
 
       <div className="pointer-events-none absolute inset-x-2 bottom-2 flex items-end justify-between gap-2">
-        <span className="font-mono text-[0.625rem] text-sage">
-          {view === "3d" && env.gl ? (env.fine ? HINT : HINT_TOUCH)[model] : ""}
+        <span className="min-w-0 font-mono text-[0.625rem] leading-tight text-sage">
+          {view === "3d" && env.gl
+            ? model === "pod" && podFocus
+              ? HINT_POD_FOCUS
+              : (env.fine ? HINT : HINT_TOUCH)[model]
+            : ""}
         </span>
-        <div className="pointer-events-auto flex items-center gap-1.5">
+        <div className="pointer-events-auto flex shrink-0 items-center gap-1.5">
           {model === "nids" && view === "3d" && (
             <button
               type="button"
@@ -130,6 +141,16 @@ export function ModelWindow({ model, media }: { model: ModelKey; media: TileMedi
               className="rounded-[3px] border border-line-strong bg-mat-shade/75 px-2 py-0.5 font-mono text-[0.625rem] text-ink backdrop-blur-sm hover:border-brass"
             >
               Push
+            </button>
+          )}
+          {model === "pod" && view === "3d" && env.gl && (
+            <button
+              type="button"
+              aria-pressed={podFocus}
+              onClick={() => setPodFocus((f) => !f)}
+              className={`rounded-[3px] border px-2 py-0.5 font-mono text-[0.625rem] backdrop-blur-sm transition-colors ${podFocus ? "border-brass bg-brass text-mat-shade" : "border-line-strong bg-mat-shade/75 text-ink hover:border-brass"}`}
+            >
+              {podFocus ? "Done" : "Use screen"}
             </button>
           )}
           {hasPhoto && env.gl && (

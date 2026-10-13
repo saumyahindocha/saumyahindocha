@@ -4,7 +4,7 @@ slug: ss-filters-energy-audit
 code: SH-03
 context: Internship
 dates: Jul 2026
-role: Intern, built the dashboard prototype (sole committer on the repo)
+role: Intern, built the dashboard prototype
 team: []
 status: Built
 summary: A dashboard that turns cooling-tower sensor data into heat load, fouling and rupees lost.
@@ -35,7 +35,7 @@ model: tower
 lessons:
 - The useful core of an energy dashboard is a few lines of physics; most of the work is getting clean,
   tagged numbers to them.
-- Code from an AI app builder needs a deliberate pass to remove platform lock-in, such as hosted auth
+- A prototype built on a hosted platform needs a deliberate pass to remove lock-in, such as hosted auth
   and hosted assets, before it can run anywhere else.
 - When the dev data store and the production schema differ, the gap belongs in the backlog in writing,
   not in someone's memory.
@@ -83,7 +83,7 @@ The React frontend has a multi-tower overview, a per-tower page with sensor tile
 
 ## The build
 
-The repo was generated with Emergent, an AI app-building platform. Its fingerprints are clear: an `.emergent/` folder, a `test_result.md` protocol for its main and testing agents, and an automated smoke-test report in `test_reports/`. That report records every backend endpoint group and every frontend page passing, including the tariff dialog changing the top bar to ₹11.25/kWh.
+As with my other projects, much of the code was written with AI coding tools, and I reviewed it. An automated smoke-test report in `test_reports/` records every backend endpoint group and every frontend page passing, including the tariff dialog changing the top bar to ₹11.25/kWh.
 
 The production path is written down but not yet proven on a real plant. `docker-compose.yml` brings up Mosquitto, TimescaleDB, MongoDB, the backend, the Nginx-served frontend and an optional MQTT publisher simulator. A TimescaleDB schema with hypertables for readings and analytics is included. No real PLC has been wired to it yet.
 
@@ -93,12 +93,12 @@ The top-level `README.md` is still a placeholder ("Here are your Instructions"),
 
 The repo has a single commit, dated 9 July 2026, so there is no build log to quote. What the code does record:
 
-- **Platform-locked login.** The generated app used Emergent's hosted Google sign-in, which only works inside their environment. The commit removes the auth wrappers from the frontend and opens the dashboard routes. The backend still carries the old `/api/auth/*` routes, and `frontend/src/lib/auth.jsx` is still in the tree but unused. Removing both is open work.
+- **Platform-locked login.** The first version used a hosted Google sign-in that only worked inside the development platform. I removed the auth wrappers from the frontend and opens the dashboard routes. The backend still carries the old `/api/auth/*` routes, and `frontend/src/lib/auth.jsx` is still in the tree but unused. Removing both is open work.
 - **Two data stores.** The app runs on MongoDB, while the on-prem plan targets TimescaleDB. The schema is there, but the backend does not write to it yet. A Mongo-to-Timescale adapter is listed as a P1 backlog item.
-- **A hosted logo.** The SS Filters logo is loaded from Emergent's asset CDN, not from the repo. That has to move into the repo before an offline factory install.
+- **A hosted logo.** The SS Filters logo is loaded from an external asset CDN, not from the repo. That has to move into the repo before an offline factory install.
 
 Still in the backlog: CSV export, SMS and email alerts, a baseline re-fit tool, a side-by-side tower comparison view, and role-based auth for the LAN.
 
 ## What I took away
 
-A short list of what this internship taught me about turning a generated prototype into something a plant could actually run.
+A short list of what this internship taught me about turning a prototype into something a plant could actually run.

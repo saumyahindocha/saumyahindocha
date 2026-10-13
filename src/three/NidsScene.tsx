@@ -56,8 +56,14 @@ export type NidsHandle = { push: (dir?: number) => void };
 
 export const NidsScene = forwardRef<
   NidsHandle,
-  { interactive: boolean; reducedMotion: boolean; onReady?: () => void; active: boolean }
->(function NidsScene({ interactive, reducedMotion, onReady, active }, ref) {
+  {
+    interactive: boolean;
+    reducedMotion: boolean;
+    onReady?: () => void;
+    active: boolean;
+    compact?: boolean;
+  }
+>(function NidsScene({ interactive, reducedMotion, onReady, active, compact = false }, ref) {
   const bot = useRef<BotHandle>(null);
   useImperativeHandle(ref, () => ({ push: (dir = 1) => bot.current?.push(dir) }));
 
@@ -65,7 +71,12 @@ export const NidsScene = forwardRef<
     <Canvas
       dpr={[1, 1.75]}
       frameloop={active ? "always" : "never"}
-      camera={{ position: [4.4, 2.6, 5.2], fov: 32, near: 0.1, far: 50 }}
+      camera={{
+        position: compact ? [4.7, 2.7, 5.5] : [4.4, 2.6, 5.2],
+        fov: 32,
+        near: 0.1,
+        far: 50,
+      }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       onCreated={() => onReady?.()}
       style={{ touchAction: interactive ? "none" : "pan-y" }}

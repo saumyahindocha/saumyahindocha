@@ -9,6 +9,8 @@ export type TileMedia =
   | { kind: "photo"; src: string; width: number; height: number; alt: string }
   | { kind: "drawing"; name: "cooling-tower" };
 
+export type ModelKey = "nids" | "pod" | "gate" | "tower";
+
 export type ProjectTileData = {
   code: string;
   silk: string;
@@ -20,6 +22,7 @@ export type ProjectTileData = {
   headlines: [Headline, Headline, Headline];
   tilt: number;
   media: TileMedia;
+  model: ModelKey;
 };
 
 export const projects: ProjectTileData[] = [
@@ -28,8 +31,7 @@ export const projects: ProjectTileData[] = [
     silk: "J1 · NIDS",
     slug: "nids-self-balancing-robot",
     title: "NIDS",
-    summary:
-      "A two-wheeled self-balancing robot. I led a team of four. It balanced unassisted for about 50 s and was exhibited at the ITSP 2026 showcase.",
+    summary: "A two-wheeled self-balancing robot. I led a team of four.",
     context: "ITSP 2026",
     status: "Built",
     headlines: [
@@ -38,6 +40,7 @@ export const projects: ProjectTileData[] = [
       { value: "₹5.6–9.2k", label: "bill of materials" },
     ],
     tilt: -0.4,
+    model: "nids",
     media: {
       kind: "photo",
       src: "/media/nids-assembled.webp",
@@ -60,6 +63,7 @@ export const projects: ProjectTileData[] = [
       { value: "87+134+31", label: "tests passing" },
     ],
     tilt: -0.6,
+    model: "gate",
     media: {
       kind: "photo",
       src: "/media/parking-dashboard-live.webp",
@@ -82,6 +86,7 @@ export const projects: ProjectTileData[] = [
       { value: "3.517 kW", label: "per ton of refrigeration" },
     ],
     tilt: 0.5,
+    model: "tower",
     media: { kind: "drawing", name: "cooling-tower" },
   },
   {
@@ -98,6 +103,7 @@ export const projects: ProjectTileData[] = [
       { value: "52×109", label: "mm PCB, 2 layers" },
     ],
     tilt: -0.4,
+    model: "pod",
     media: {
       kind: "photo",
       src: "/media/pod-perfboard-underside.webp",

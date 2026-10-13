@@ -1,20 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import type { ProjectTileData, TileMedia } from "@/content/placeholder";
-import { TowerWindow } from "./TowerWindow";
+import type { ProjectTileData } from "@/content/placeholder";
+import { ModelWindow } from "./ModelWindow";
 import { Silk } from "./Silk";
 import { StatusChip } from "./StatusChip";
 import { SpecStrip } from "./SpecStrip";
 
 /** A project laid on the mat. Lifts slightly on hover; the shadow spreads. */
-export function ProjectTile({
-  project,
-  featured = false,
-}: {
-  project: ProjectTileData;
-  featured?: boolean;
-}) {
+export function ProjectTile({ project }: { project: ProjectTileData }) {
   const href = `/projects/${project.slug}`;
   return (
     <article
@@ -38,12 +31,10 @@ export function ProjectTile({
         <StatusChip status={project.status} />
       </header>
 
-      <div className={featured ? "md:mt-1 md:grid md:grid-cols-[1.35fr_1fr] md:gap-8" : ""}>
-        <TileWindow media={project.media} featured={featured} />
+      <div>
+        <TileWindow project={project} />
         <div className="flex flex-col">
-          <h3
-            className={`mt-5 font-semibold tracking-tight text-ink ${featured ? "text-2xl sm:text-3xl md:mt-4" : "text-xl sm:text-2xl"}`}
-          >
+          <h3 className="mt-5 text-xl font-semibold tracking-tight text-ink sm:text-2xl">
             <Link href={href} className="tile-link after:absolute after:inset-0 after:rounded-md">
               {project.title}
             </Link>
@@ -75,27 +66,14 @@ export function ProjectTile({
   );
 }
 
-/** The tile's picture: a photo inset like a print, or a line drawing on the tile. */
-function TileWindow({ media, featured }: { media: TileMedia; featured: boolean }) {
+/** The tile's picture: a 3D model with a switch to the real photo. Sits above the tile link. */
+function TileWindow({ project }: { project: ProjectTileData }) {
   return (
-    <div
-      className={`relative mt-4 overflow-hidden ${featured ? "aspect-[16/10] md:aspect-[4/3]" : "aspect-[16/10]"} rounded-[3px] border border-line bg-mat-shade`}
-    >
-      {media.kind === "photo" ? (
-        <Image
-          src={media.src}
-          alt={media.alt}
-          width={media.width}
-          height={media.height}
-          sizes={featured ? "(min-width: 768px) 620px, 92vw" : "(min-width: 768px) 520px, 92vw"}
-          className="size-full object-cover brightness-[0.88] saturate-[0.85] transition-[filter,transform] duration-300 group-hover:scale-[1.02] group-hover:brightness-100 group-hover:saturate-100"
-        />
-      ) : (
-        <TowerWindow />
-      )}
+    <div className="relative z-10 mt-4 aspect-[4/3] overflow-hidden rounded-[3px] border border-line bg-mat-shade/60">
+      <ModelWindow model={project.model} media={project.media} />
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgb(242_239_230/0.06),inset_0_-40px_60px_-30px_rgb(5_18_12/0.6)]"
+        className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgb(242_239_230/0.06)]"
       />
     </div>
   );

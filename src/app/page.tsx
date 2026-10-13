@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { AngleGuides } from "@/components/bench/AngleGuides";
 import { DimensionLine } from "@/components/bench/DimensionLine";
-import { HeroModel } from "@/components/bench/HeroModel";
 import { ProjectTile } from "@/components/bench/ProjectTile";
 import { Reveal } from "@/components/bench/Reveal";
 import { RulerStrip } from "@/components/bench/RulerStrip";
@@ -13,7 +12,6 @@ export default function Home() {
     <>
       <Hero />
       <RulerStrip className="mt-6" />
-      <WhatIDo />
       <Projects />
       <Competitions />
       <Currently />
@@ -26,7 +24,7 @@ export default function Home() {
 
 function Hero() {
   return (
-    <section className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pt-10 pb-8 sm:px-8 md:grid-cols-[1fr_1.2fr] md:pt-16 lg:pt-20">
+    <section className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pt-10 pb-8 sm:px-8 md:grid-cols-[1.05fr_1fr] md:gap-14 md:pt-16 lg:pt-20">
       <AngleGuides className="absolute -top-16 -left-24 hidden w-[520px] md:block" />
       <div className="relative">
         <p className="font-mono text-sm text-brass">Mechanical Design &amp; Robotics</p>
@@ -56,42 +54,26 @@ function Hero() {
         </div>
       </div>
 
-      <figure className="relative mx-auto w-full max-w-[480px] md:max-w-none">
-        <HeroModel />
-        <figcaption className="mt-2 text-center text-xs text-sage-dim">
-          NIDS, built from its real dimensions. A push settles the way its MATLAB-tuned controller does.
-        </figcaption>
-      </figure>
-    </section>
-  );
-}
-
-function WhatIDo() {
-  return (
-    <section aria-labelledby="what-i-do" className="mx-auto max-w-6xl px-5 pt-20 sm:px-8">
-      <Reveal>
-        <h2 id="what-i-do" className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          What I do
-        </h2>
-        <p className="mt-4 max-w-[62ch] leading-relaxed text-sage">
+      {/* What I do sits beside the intro, so no single project takes the hero. */}
+      <div className="relative rounded-md border border-line bg-mat-deep/70 p-5 shadow-[var(--shadow-rest)] backdrop-blur-[2px] sm:p-6">
+        <h2 className="text-lg font-semibold tracking-tight">What I do</h2>
+        <p className="mt-2 text-[0.9375rem] leading-relaxed text-sage">
           I own the engineering: hardware choices, wiring, mechanical design and testing. I write
           much of the firmware with AI coding agents and review it. Every project has a README and a
           dated build log.
         </p>
-      </Reveal>
-      <div className="mt-10 grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-2">
-        {disciplines.map((d, i) => (
-          <Reveal key={d.key} delay={i * 60} className="bg-mat-deep/85 p-6 sm:p-7">
-            <div className="flex items-baseline gap-4">
+        <ul className="mt-5 divide-y divide-line border-t border-line">
+          {disciplines.map((d) => (
+            <li key={d.key} className="flex items-baseline gap-4 py-3.5">
               <span className="font-mono text-sm text-brass">{d.key}</span>
-              <div>
-                <h3 className="text-lg font-semibold tracking-tight">{d.title}</h3>
-                <p className="mt-1 font-mono text-xs text-sage">{d.tools}</p>
-                <p className="mt-4 text-[0.9375rem] leading-relaxed text-ink/85">{d.example}</p>
+              <div className="min-w-0">
+                <h3 className="text-[0.9375rem] font-semibold">{d.title}</h3>
+                <p className="mt-0.5 font-mono text-[0.6875rem] text-sage">{d.tools}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-ink/80">{d.example}</p>
               </div>
-            </div>
-          </Reveal>
-        ))}
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
@@ -99,7 +81,7 @@ function WhatIDo() {
 
 function Projects() {
   return (
-    <section aria-labelledby="projects" className="mx-auto max-w-6xl px-5 pt-24 sm:px-8">
+    <section aria-labelledby="projects" className="mx-auto max-w-6xl px-5 pt-20 sm:px-8">
       <div className="flex items-end justify-between gap-4">
         <h2 id="projects" className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Projects
@@ -108,23 +90,11 @@ function Projects() {
           All projects
         </Link>
       </div>
-      <ul className="mt-10 grid items-start gap-8 md:grid-cols-2 md:gap-x-10 md:gap-y-12 lg:grid-cols-3 lg:gap-x-8">
+      {/* Every project gets the same tile size and a live model. */}
+      <ul className="mt-10 grid gap-8 md:grid-cols-2 md:gap-10">
         {projects.map((p, i) => (
-          <Reveal
-            as="li"
-            key={p.code}
-            delay={i === 0 ? 0 : ((i - 1) % 2) * 80}
-            className={
-              i === 0
-                ? "md:col-span-2 lg:col-span-3"
-                : i === 2
-                  ? "md:mt-16 lg:mt-12"
-                  : i === 3
-                    ? "lg:mt-6"
-                    : ""
-            }
-          >
-            <ProjectTile project={p} featured={i === 0} />
+          <Reveal as="li" key={p.code} delay={(i % 2) * 80}>
+            <ProjectTile project={p} />
           </Reveal>
         ))}
       </ul>

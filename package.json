@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "prebuild": "node scripts/resume-pdf.mjs",
-    "resume:pdf": "node scripts/resume-pdf.mjs"
+    "resume:pdf": "node scripts/resume-pdf.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.9.0",
@@ -37,9 +38,11 @@
     "@types/three": "^0.180.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
+    "pcb-stackup": "^4.2.8",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

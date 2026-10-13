@@ -4,12 +4,13 @@ import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import {
   ContactShadows,
   Environment,
+  Grid,
   Html,
   Lightformer,
   OrbitControls,
   RoundedBox,
 } from "@react-three/drei";
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 
 /*
@@ -19,9 +20,10 @@ import * as THREE from "three";
     CoG 108 mm above the axle (matlab/balance_model.m).
   Plate spacing isn't documented; it follows the Fusion 360 screenshot by eye.
 
-  The push response uses the dominant closed-loop poles from balance_model.m
-  (-2.04 ± 1.83j); the fast pole at -172.3 settles in milliseconds and is left out.
-  The full nonlinear sim with sliders is stage 3.
+  On a tile, the push response uses the dominant closed-loop poles from
+  balance_model.m (-2.04 ± 1.83j); the fast pole at -172.3 settles in
+  milliseconds and is left out. On the project page, `drive` hands the pose to
+  the live sim in src/sims/nids instead, and the floor slides as the wheels roll.
 */
 
 const AXLE_Y = 0.5;
@@ -53,6 +55,12 @@ const lipo = new THREE.MeshStandardMaterial({ color: "#e0782f", roughness: 0.6 }
 const brass = new THREE.MeshStandardMaterial({ color: "#ddb06f", metalness: 0.7, roughness: 0.3 });
 
 export type NidsHandle = { push: (dir?: number) => void };
+/** Pose from the live sim: pitch θ (rad, positive leans back toward −z) and wheel travel p (m). */
+export type NidsPose = { theta: number; p: number };
+
+const R_WHEEL = 0.05; // m
+const UNITS_PER_M = 10;
+const FLOOR_CELL = 1.2; // 120 mm, the mat's major grid
 
 export const NidsScene = forwardRef<
   NidsHandle,
@@ -62,8 +70,14 @@ export const NidsScene = forwardRef<
     onReady?: () => void;
     active: boolean;
     compact?: boolean;
+    /** Live-sim mode: the robot follows this pose, and clicks call onPush instead. */
+    drive?: RefObject<NidsPose>;
+    onPush?: (dir: number) => void;
   }
->(function NidsScene({ interactive, reducedMotion, onReady, active, compact = false }, ref) {
+>(function NidsScene(
+  { interactive, reducedMotion, onReady, active, compact = false, drive, onPush },
+  ref,
+) {
   const bot = useRef<BotHandle>(null);
   useImperativeHandle(ref, () => ({ push: (dir = 1) => bot.current?.push(dir) }));
 
@@ -101,7 +115,8 @@ export const NidsScene = forwardRef<
         <Lightformer form="ring" intensity={1.2} position={[4, 3, -3]} scale={2} color="#ffd9a0" />
       </Environment>
 
-      <Bot ref={bot} reducedMotion={reducedMotion} />
+      <Bot ref={bot} reducedMotion={reducedMotion} drive={drive} onPush={onPush} />
+      {drive && <Floor drive={drive} />}
 
       <ContactShadows
         position={[0, 0.001, 0]}
@@ -121,7 +136,7 @@ export const NidsScene = forwardRef<
         enableRotate={interactive}
         minPolarAngle={Math.PI * 0.18}
         maxPolarAngle={Math.PI * 0.49}
-        autoRotate={!reducedMotion}
+        autoRotate={!reducedMotion && !drive}
         autoRotateSpeed={0.55}
         enableDamping
       />
@@ -131,7 +146,10 @@ export const NidsScene = forwardRef<
 
 type BotHandle = { push: (dir: number) => void };
 
-const Bot = forwardRef<BotHandle, { reducedMotion: boolean }>(function Bot({ reducedMotion }, ref) {
+const Bot = forwardRef<
+  BotHandle,
+  { reducedMotion: boolean; drive?: RefObject<NidsPose>; onPush?: (dir: number) => void }
+>(function Bot({ reducedMotion, drive, onPush: onPushProp }, ref) {
   const body = useRef<THREE.Group>(null);
   const wheels = useRef<THREE.Group[]>([]);
   const pushAt = useRef<number | null>(null);
@@ -148,6 +166,12 @@ const Bot = forwardRef<BotHandle, { reducedMotion: boolean }>(function Bot({ red
   }));
 
   useFrame((_, dt) => {
+    if (drive) {
+      const pose = drive.current;
+      if (body.current) body.current.rotation.x = -pose.theta;
+      for (const w of wheels.current) if (w) w.rotation.x = pose.p / R_WHEEL;
+      return;
+    }
     clock.current += Math.min(dt, 1 / 30);
     let theta = 0;
     let thetaDot = 0;
@@ -171,6 +195,11 @@ const Bot = forwardRef<BotHandle, { reducedMotion: boolean }>(function Bot({ red
 
   const onPush = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
+    if (onPushProp) {
+      // A click on the front face shoves the top backwards, and vice versa.
+      onPushProp(e.point.z >= 0 ? 1 : -1);
+      return;
+    }
     pushDir.current = e.point.z >= 0 ? -1 : 1;
     pushAt.current = clock.current;
   };
@@ -331,6 +360,32 @@ const Bot = forwardRef<BotHandle, { reducedMotion: boolean }>(function Bot({ red
     </group>
   );
 });
+
+/** The floor slides under the robot as the wheels roll, so the robot stays in frame. */
+function Floor({ drive }: { drive: RefObject<NidsPose> }) {
+  const grid = useRef<THREE.Group>(null);
+  useFrame(() => {
+    if (!grid.current) return;
+    const z = drive.current.p * UNITS_PER_M;
+    grid.current.position.z = -(((z % FLOOR_CELL) + FLOOR_CELL) % FLOOR_CELL);
+  });
+  return (
+    <group ref={grid}>
+      <Grid
+        position={[0, 0.002, 0]}
+        args={[12, 12]}
+        cellSize={0.12}
+        cellThickness={0.6}
+        cellColor="#3d6b57"
+        sectionSize={FLOOR_CELL}
+        sectionThickness={1}
+        sectionColor="#6f9a83"
+        fadeDistance={11}
+        fadeStrength={1.6}
+      />
+    </group>
+  );
+}
 
 function Wheel() {
   const tread = useMemo(() => {

@@ -4,6 +4,9 @@ import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { Gallery } from "@/components/bench/Gallery";
 import { Reveal } from "@/components/bench/Reveal";
+import { NidsLab } from "@/components/sims/NidsLab";
+import { RemotePcb } from "@/components/sims/RemotePcb";
+import type { ModelKey } from "@/lib/types";
 import { ModelWindow } from "@/components/bench/ModelWindow";
 import { Silk } from "@/components/bench/Silk";
 import { SpecStrip } from "@/components/bench/SpecStrip";
@@ -11,6 +14,26 @@ import { StatusChip } from "@/components/bench/StatusChip";
 import { getProject, getProjects, sections } from "@/lib/projects";
 
 export const dynamicParams = false;
+
+// Project pages with a full interactive lab; the rest show the tile's model for now.
+const LAB: Partial<Record<ModelKey, React.ReactNode>> = {
+  nids: (
+    <>
+      <NidsLab />
+      <p className="mt-4 max-w-[70ch] text-xs leading-relaxed text-sage-dim">
+        The sim runs the linear model from <code>matlab/balance_model.m</code> (report Table 6.1),
+        stepped with fixed-step RK4 every 1 ms. Around it sit the firmware&apos;s PID form, its
+        Kalman filter, a 9.1 V motor limit and the 35° fall cut-off. The IMU noise, the floor
+        disturbance, the 5 ms control period and the outer-loop gains are assumptions for the sim,
+        not measurements from the robot. The pole-zero map and step response use the same model, so
+        its poles match MATLAB: −172.3 and −2.04 ± 1.83j.
+      </p>
+      <div className="mt-10">
+        <RemotePcb />
+      </div>
+    </>
+  ),
+};
 
 export function generateStaticParams() {
   return getProjects().map((p) => ({ slug: p.slug }));
@@ -83,13 +106,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       {/* 3. Model */}
       <section id="model" aria-label="Interactive model" className="mt-10">
         <Reveal>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-mat-shade/60 shadow-[var(--shadow-rest)] sm:aspect-[16/9]">
-            <ModelWindow model={project.model} media={project.tile.cover} />
-          </div>
-          <p className="mt-3 text-xs text-sage-dim">
-            A first look at the model. The full interactive version, with controls and live plots,
-            is being built next.
-          </p>
+          {LAB[project.model] ?? (
+            <>
+              <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-mat-shade/60 shadow-[var(--shadow-rest)] sm:aspect-[16/9]">
+                <ModelWindow model={project.model} media={project.tile.cover} />
+              </div>
+              <p className="mt-3 text-xs text-sage-dim">
+                A first look at the model. The full interactive version, with controls and live
+                plots, is being built next.
+              </p>
+            </>
+          )}
         </Reveal>
       </section>
 

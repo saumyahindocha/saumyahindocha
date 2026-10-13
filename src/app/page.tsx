@@ -79,6 +79,8 @@ function Hero() {
   );
 }
 
+const SPAN = ["md:col-span-7", "md:col-span-5", "md:col-span-6", "md:col-span-6"];
+
 function Projects() {
   return (
     <section aria-labelledby="projects" className="mx-auto max-w-6xl px-5 pt-20 sm:px-8">
@@ -90,10 +92,10 @@ function Projects() {
           All projects
         </Link>
       </div>
-      {/* Every project gets the same tile size and a live model. */}
-      <ul className="mt-10 grid gap-8 md:grid-cols-2 md:gap-10">
+      {/* Every project gets a live model and close to the same space; NIDS is a touch wider. */}
+      <ul className="mt-10 grid gap-8 md:grid-cols-12 md:gap-10">
         {projects.map((p, i) => (
-          <Reveal as="li" key={p.code} delay={(i % 2) * 80}>
+          <Reveal as="li" key={p.code} delay={(i % 2) * 80} className={SPAN[i] ?? "md:col-span-6"}>
             <ProjectTile project={p} />
           </Reveal>
         ))}

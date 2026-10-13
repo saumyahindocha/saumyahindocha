@@ -6,6 +6,8 @@ import { Gallery } from "@/components/bench/Gallery";
 import { Reveal } from "@/components/bench/Reveal";
 import { NidsLab } from "@/components/sims/NidsLab";
 import { RemotePcb } from "@/components/sims/RemotePcb";
+import { GateLab } from "@/components/sims/GateLab";
+import { ArchDiagram } from "@/components/sims/ArchDiagram";
 import type { ModelKey } from "@/lib/types";
 import { ModelWindow } from "@/components/bench/ModelWindow";
 import { Silk } from "@/components/bench/Silk";
@@ -30,6 +32,22 @@ const LAB: Partial<Record<ModelKey, React.ReactNode>> = {
       </p>
       <div className="mt-10">
         <RemotePcb />
+      </div>
+    </>
+  ),
+  gate: (
+    <>
+      <GateLab />
+      <p className="mt-4 max-w-[70ch] text-xs leading-relaxed text-sage-dim">
+        The day is a port of the repo&apos;s own full-day simulator: 3,000 bikes, 40 % on monthly
+        passes, a morning entry peak and an evening exit peak, 2 % of reads unreadable and 2 %
+        misread, and a quarter of walk-in payments in cash. Charges come from a port of the
+        backend&apos;s tariff engine, tested against its own cases. Plates are made up, and the
+        frame reads under &quot;Show pipeline&quot; illustrate the vote rather than come from the
+        reader.
+      </p>
+      <div className="mt-10">
+        <ArchDiagram />
       </div>
     </>
   ),

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Manrope } from "next/font/google";
+import { Bricolage_Grotesque, JetBrains_Mono, Manrope } from "next/font/google";
 import { BenchFX } from "@/components/bench/BenchFX";
 import { Nav } from "@/components/bench/Nav";
 import { Footer } from "@/components/bench/Footer";
@@ -8,6 +8,13 @@ import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin"], display: "optional" });
+// Headings only. The optical-size axis gives big titles the tighter display cut.
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
+  subsets: ["latin"],
+  axes: ["opsz"],
+  display: "optional",
+});
 const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
@@ -21,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s · Saumya Hindocha",
   },
   description:
-    "Mechanical engineering student at IIT Bombay. I build machines where mechanical design meets electronics and code, and document every build from the breadboard up.",
+    "Second-year mechanical engineering student at IIT Bombay. A self-balancing robot, a Pico music player, a number-plate parking system and a cooling-tower energy audit, with what broke along the way.",
 };
 
 export const viewport: Viewport = {
@@ -30,7 +37,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${manrope.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${bricolage.variable} ${jetbrains.variable}`}>
       <body className="antialiased">
         <a
           href="#main"

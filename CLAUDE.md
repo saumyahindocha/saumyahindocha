@@ -38,9 +38,11 @@ from Saumya directly. Nothing is rounded up, invented or implied.
 
 ## Design rules (short version of DESIGN.md)
 
-- One canvas: the green cutting mat with its 12 px / 120 px grid. One accent: brass. No light mode,
-  no second accent colour, no gradient text.
-- Manrope for words, JetBrains Mono for every number, unit, code and label.
+- One canvas: the green cutting mat with its 12 px / 120 px grid. Brass for controls, copper for
+  the most important text (headline numbers, one emphasis line, key links). No light mode, no
+  third accent colour, no gradient text.
+- Bricolage Grotesque for headings, Manrope for body, JetBrains Mono for every number, unit, code
+  and label.
 - Tiles rest on the mat with soft shadows and lift slightly on hover.
 - No project is the centrepiece: the four home tiles are near equal (7/5, then 6/6 columns), each
   with its own model. Keep it that way when adding projects.

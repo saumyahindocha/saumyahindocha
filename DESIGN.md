@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: The Design Bench
-description: Saumya Hindocha's portfolio design system. The site is a workbench seen from above. A deep-green self-healing cutting mat is the canvas, projects rest on it as tiles with soft, realistic shadows, and the only accent is warm brass, like solder pads and brass inserts. Calm and premium first, interactive second.
+description: Saumya Hindocha's portfolio design system. The site is a workbench seen from above. A deep-green self-healing cutting mat is the canvas, projects rest on it as tiles with soft, realistic shadows, brass marks the controls, and copper (like bare PCB traces) marks the text that matters most. Calm and premium first, interactive second.
 
 colors:
   mat: "#1d4b39"
@@ -17,28 +17,29 @@ colors:
   brass: "#ddb06f"
   brass-deep: "#b8874a"
   on-brass: "#10291f"
+  copper: "#f4b08c"
 
 typography:
   display:
-    fontFamily: Manrope, system-ui, sans-serif
+    fontFamily: Bricolage Grotesque, Manrope, system-ui, sans-serif
     fontSize: 60px
     fontWeight: 600
     lineHeight: 1.05
     letterSpacing: -0.03em
   display-mobile:
-    fontFamily: Manrope
+    fontFamily: Bricolage Grotesque
     fontSize: 40px
     fontWeight: 600
     lineHeight: 1.05
     letterSpacing: -0.03em
   h2:
-    fontFamily: Manrope
+    fontFamily: Bricolage Grotesque
     fontSize: 30px
     fontWeight: 600
     lineHeight: 1.2
     letterSpacing: -0.015em
   h3:
-    fontFamily: Manrope
+    fontFamily: Bricolage Grotesque
     fontSize: 24px
     fontWeight: 600
     lineHeight: 1.25
@@ -118,15 +119,19 @@ seasoning. If a section has more than one of them, remove one.
 
 ### Accent
 
-- `brass` is the one accent: primary button fill, link underlines, context labels, focus rings,
+- `brass` is the control accent: primary button fill, link underlines, context labels, focus rings,
   corner pads, leader dots. 5.0:1 on `mat` when used as text.
-- Never introduce a second accent. Status colours (red, amber, green) appear only inside sims and
-  demos, never in page chrome.
+- `copper` (#F4B08C) is for the text that matters most: headline numbers in spec strips, the one
+  emphasis line in the hero, dates in the bug log, bold text in write-ups, contact links. 5.4:1 on
+  `mat`, 7.3:1 on `surface`. Use it on text only, never as a fill, and no more than one copper
+  sentence per section.
+- No third accent. Status colours (red, amber, green) appear only inside sims and demos, never in
+  page chrome.
 
 ## Typography
 
-- **Manrope** for headings and body. **JetBrains Mono** for every number, label, spec, unit and
-  designator.
+- **Bricolage Grotesque** for headings (h1 to h3, optical sizing on), **Manrope** for body,
+  **JetBrains Mono** for every number, label, spec, unit and designator.
 - Headings use weight and tracking for hierarchy, not size jumps. Display tops out at 60 px.
 - Silkscreen labels (`silk`) are small uppercase mono, like PCB designators: `SH-01 / NIDS`,
   `U1`, `R7`. Use them on tiles and list rows, not as eyebrows above every section heading.
@@ -228,7 +233,7 @@ that follows a mouse pointer. Off on touch devices and with `prefers-reduced-mot
 
 ### Don't
 
-- Don't add a second accent colour, gradients on text, or glows.
+- Don't add a third accent colour, gradients on text, or glows.
 - Don't put a silkscreen eyebrow above every section heading.
 - Don't use a light mode or a theme toggle.
 - Don't add clubs, awards, a photo slot or a contact form.

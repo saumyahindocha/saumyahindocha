@@ -3,7 +3,8 @@
 
 /*
   The design bench. Tokens live here and in DESIGN.md; keep the two in sync.
-  One accent (brass). Status colours appear only inside sims.
+  Brass is the accent for controls (buttons, focus, chips). Copper is for the text that matters
+  most: headline numbers, emphasis, key links. Status colours appear only inside sims.
 */
 @theme {
   --color-mat: #1d4b39;
@@ -18,8 +19,11 @@
   --color-line-strong: rgb(242 239 230 / 0.28);
   --color-brass: #ddb06f;
   --color-brass-deep: #b8874a;
+  /* Copper, like bare PCB traces: complements the green, 5.4:1 on mat, 7.3:1 on surface. */
+  --color-copper: #f4b08c;
 
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", monospace;
 
   /* Type scale (1.25 ratio, rem) */
@@ -85,6 +89,8 @@ body {
 h1,
 h2,
 h3 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
   text-wrap: balance;
 }
 
@@ -362,7 +368,7 @@ button {
   margin-top: 1rem;
 }
 .prose-bench strong {
-  color: var(--color-ink);
+  color: var(--color-copper);
   font-weight: 600;
 }
 .prose-bench a {

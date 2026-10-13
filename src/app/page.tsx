@@ -5,7 +5,7 @@ import { ProjectTile } from "@/components/bench/ProjectTile";
 import { Reveal } from "@/components/bench/Reveal";
 import { RulerStrip } from "@/components/bench/RulerStrip";
 import { Silk } from "@/components/bench/Silk";
-import { disciplines } from "@/content/site";
+import { bugLog, disciplines } from "@/content/site";
 import { getProjects, toTile } from "@/lib/projects";
 
 export default function Home() {
@@ -14,9 +14,10 @@ export default function Home() {
       <Hero />
       <RulerStrip className="mt-6" />
       <Projects />
-      <Competitions />
-      <Currently />
+      <HowIWork />
+      <Now />
       <Experience />
+      <Started />
       <RulerStrip start={12} className="mt-24" />
       <Contact />
     </>
@@ -28,16 +29,21 @@ function Hero() {
     <section className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pt-10 pb-8 sm:px-8 md:grid-cols-[1.05fr_1fr] md:gap-14 md:pt-16 lg:pt-20">
       <AngleGuides className="absolute -top-16 -left-24 hidden w-[520px] md:block" />
       <div className="relative">
-        <p className="font-mono text-sm text-brass">Mechanical Design &amp; Robotics</p>
+        <p className="font-mono text-sm text-brass">Mechanical engineering, IIT Bombay</p>
         <h1
           translate="no"
-          className="mt-4 text-[2.5rem] leading-[1.05] font-semibold tracking-[-0.03em] text-ink sm:text-6xl"
+          className="mt-4 text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.035em] text-ink sm:text-[4rem]"
         >
           Saumya Hindocha
         </h1>
-        <p className="mt-5 max-w-[44ch] text-lg leading-relaxed text-sage">
-          I build machines where mechanical design meets electronics and code, and document every
-          build from the breadboard up.
+        <p className="mt-6 max-w-[46ch] text-lg leading-relaxed text-sage">
+          I’m in my second year. Outside class I build things that have to survive the real world:{" "}
+          <span className="text-ink">a robot that balances on two wheels</span>,{" "}
+          <span className="text-ink">a music player I soldered in one night</span> and{" "}
+          <span className="text-ink">a parking system built to read plates on moving bikes</span>.
+        </p>
+        <p className="mt-4 max-w-[46ch] text-lg leading-relaxed font-medium text-copper">
+          I write down what broke on every build, because that’s where most of the learning was.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link
@@ -54,29 +60,70 @@ function Hero() {
           </Link>
         </div>
       </div>
-
-      {/* What I do sits beside the intro, so no single project takes the hero. */}
-      <div className="relative rounded-md border border-line bg-mat-deep/70 p-5 shadow-[var(--shadow-rest)] backdrop-blur-[2px] sm:p-6">
-        <h2 className="text-lg font-semibold tracking-tight">What I do</h2>
-        <p className="mt-2 text-[0.9375rem] leading-relaxed text-sage">
-          I own the engineering: hardware choices, wiring, mechanical design and testing. I write
-          much of the firmware with AI coding agents and review it. Every project has a README and a
-          dated build log.
-        </p>
-        <ul className="mt-5 divide-y divide-line border-t border-line">
-          {disciplines.map((d) => (
-            <li key={d.key} className="flex items-baseline gap-4 py-3.5">
-              <span className="font-mono text-sm text-brass">{d.key}</span>
-              <div className="min-w-0">
-                <h3 className="text-[0.9375rem] font-semibold">{d.title}</h3>
-                <p className="mt-0.5 font-mono text-[0.6875rem] text-sage">{d.tools}</p>
-                <p className="mt-1.5 text-sm leading-relaxed text-ink/80">{d.example}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <BugLog />
     </section>
+  );
+}
+
+/** Real failures, one line each; open one to read the fix. Native details, so no JS. */
+function BugLog() {
+  return (
+    <div className="relative rounded-md border border-line bg-mat-deep/70 p-5 shadow-[var(--shadow-rest)] backdrop-blur-[2px] sm:p-6">
+      <h2 className="text-xl font-semibold tracking-tight">What broke, and the fix</h2>
+      <ul className="mt-4 border-t border-line">
+        {bugLog.map((b, i) => (
+          <li key={b.symptom} className="border-b border-line">
+            <details className="group" open={i === 0}>
+              <summary className="flex cursor-pointer list-none items-start gap-4 py-3.5 [&::-webkit-details-marker]:hidden">
+                <span className="hidden w-[5.5rem] shrink-0 pt-0.5 font-mono text-xs text-copper tabular-nums sm:block">
+                  {b.date}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-mono text-[0.6875rem] tracking-[0.12em] text-sage uppercase">
+                    <span className="text-copper sm:hidden">{b.date} / </span>
+                    {b.project}
+                  </span>
+                  <span className="mt-1 block text-[0.9375rem] leading-snug font-semibold text-ink">
+                    {b.symptom}
+                  </span>
+                </span>
+                <span
+                  aria-hidden
+                  className="mt-1 font-mono text-sm text-brass transition-transform duration-200 group-open:rotate-45"
+                >
+                  +
+                </span>
+              </summary>
+              <p className="-mt-1 pr-6 pb-4 text-sm leading-relaxed text-sage sm:pl-[6.5rem]">
+                {withCode(b.fix)}
+              </p>
+            </details>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 text-sm text-sage">
+        Each project page has its full list.{" "}
+        <Link
+          href="/projects"
+          className="text-ink underline decoration-brass/60 underline-offset-4 transition-colors hover:decoration-brass"
+        >
+          Browse projects
+        </Link>
+      </p>
+    </div>
+  );
+}
+
+/** Renders `backticked` spans in mono, like the project pages do for code. */
+function withCode(text: string) {
+  return text.split("`").map((part, i) =>
+    i % 2 ? (
+      <code key={i} className="font-mono text-[0.8125rem] text-ink">
+        {part}
+      </code>
+    ) : (
+      part
+    ),
   );
 }
 
@@ -109,39 +156,36 @@ function Projects() {
   );
 }
 
-// From Saumya, 13 Oct 2026.
-const competitions = [
-  {
-    silk: "C1",
-    title: "XLR8",
-    when: "First year",
-    detail: "Built a four-wheeled wireless line-following robot in a team.",
-  },
-  { silk: "C2", title: "Aeromodelling", when: "", detail: "Built a basic Depron foam plane." },
-];
-
-function Competitions() {
+function HowIWork() {
   return (
-    <section aria-labelledby="competitions" className="mx-auto max-w-6xl px-5 pt-24 sm:px-8">
-      <Reveal>
-        <h2 id="competitions" className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Competitions
+    <section aria-labelledby="how" className="mx-auto max-w-6xl px-5 pt-24 sm:px-8">
+      <Reveal className="grid gap-6 md:grid-cols-[14rem_1fr] md:gap-8">
+        <h2 id="how" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          How I work
         </h2>
+        <p className="max-w-[62ch] text-lg leading-relaxed text-sage">
+          I choose the parts, do the wiring and the mechanical design, and test everything on the
+          bench.{" "}
+          <span className="text-ink">AI coding agents write much of the firmware and software</span>
+          ; I review what they write and decide when it’s done.
+        </p>
       </Reveal>
-      <ul className="mt-8 grid gap-6 sm:grid-cols-2">
-        {competitions.map((c, i) => (
+      <ul className="mt-10 grid border-t border-l border-line sm:grid-cols-2">
+        {disciplines.map((d, i) => (
           <Reveal
             as="li"
-            key={c.title}
-            delay={i * 120}
-            className="relative rounded-md border border-line bg-surface/60 p-6"
+            key={d.key}
+            delay={(i % 2) * 120}
+            className="border-r border-b border-line p-5 sm:p-6"
           >
-            <Silk>{c.silk}</Silk>
-            <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-              <h3 className="text-xl font-semibold tracking-tight">{c.title}</h3>
-              {c.when && <span className="font-mono text-xs text-sage">{c.when}</span>}
+            <div className="flex items-baseline gap-3">
+              <span className="font-mono text-sm text-copper">{d.key}</span>
+              <h3 className="text-lg font-semibold tracking-tight">{d.title}</h3>
             </div>
-            <p className="mt-2 text-[0.9375rem] leading-relaxed text-sage">{c.detail}</p>
+            <p className="mt-1 font-mono text-xs text-sage">{d.tools}</p>
+            <p className="mt-3 max-w-[48ch] text-[0.9375rem] leading-relaxed text-ink/85">
+              {d.example}
+            </p>
           </Reveal>
         ))}
       </ul>
@@ -149,38 +193,70 @@ function Competitions() {
   );
 }
 
-function Currently() {
+function Now() {
   const items = [
-    {
-      silk: "R7",
-      title: "EE 617 research project",
-      body: "An ongoing research project in sensors and instrumentation, under the course professor.",
-    },
     {
       silk: "U4",
       title: "Pod",
-      body: "A pocket music player on a Pico 2 W, built on perfboard. Next: SD and Bluetooth tests.",
+      body: "The perfboard boots to the home screen and touch works. Next: SD playback and phone streaming on the board, then fitting the charger, switch and battery.",
+    },
+    {
+      silk: "R7",
+      title: "EE 617 research project",
+      body: "Research in sensors and instrumentation, with the course professor.",
     },
   ];
   return (
-    <section aria-labelledby="currently" className="mx-auto max-w-6xl px-5 pt-24 sm:px-8">
+    <section aria-labelledby="now" className="mx-auto max-w-6xl px-5 pt-24 sm:px-8">
       <Reveal className="grid gap-8 md:grid-cols-[14rem_1fr]">
-        <h2 id="currently" className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Currently
+        <h2 id="now" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          Now working on
         </h2>
         <ul className="divide-y divide-line border-y border-line">
           {items.map((it) => (
             <li key={it.title} className="flex gap-5 py-5">
               <Silk className="w-8 shrink-0 pt-1">{it.silk}</Silk>
               <div>
-                <h3 className="font-semibold">
-                  {it.title}
-                  <span className="ml-3 font-mono text-xs font-normal text-sage">in progress</span>
-                </h3>
+                <h3 className="text-lg font-semibold">{it.title}</h3>
                 <p className="mt-1 max-w-[60ch] text-[0.9375rem] leading-relaxed text-sage">
                   {it.body}
                 </p>
               </div>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
+    </section>
+  );
+}
+
+// From Saumya, 13 Oct 2026.
+const early = [
+  {
+    silk: "C1",
+    title: "XLR8",
+    when: "First year",
+    detail: "My first robot: a four-wheeled wireless line follower, built with a team.",
+  },
+  { silk: "C2", title: "Aeromodelling", when: "", detail: "A basic plane built from Depron foam." },
+];
+
+function Started() {
+  return (
+    <section aria-labelledby="started" className="mx-auto max-w-6xl px-5 pt-24 sm:px-8">
+      <Reveal className="grid gap-8 md:grid-cols-[14rem_1fr]">
+        <h2 id="started" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          Where I started
+        </h2>
+        <ul className="grid gap-6 sm:grid-cols-2">
+          {early.map((c) => (
+            <li key={c.title} className="relative rounded-md border border-line bg-surface/60 p-6">
+              <Silk>{c.silk}</Silk>
+              <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                <h3 className="text-xl font-semibold tracking-tight">{c.title}</h3>
+                {c.when && <span className="font-mono text-xs text-sage">{c.when}</span>}
+              </div>
+              <p className="mt-2 text-[0.9375rem] leading-relaxed text-sage">{c.detail}</p>
             </li>
           ))}
         </ul>
@@ -203,8 +279,8 @@ function Experience() {
               <span className="font-mono text-xs text-sage">July 2026</span>
             </div>
             <p className="mt-2 max-w-[60ch] text-[0.9375rem] leading-relaxed text-sage">
-              Built a real-time energy-audit dashboard for cooling towers: heat load, efficiency,
-              fouling and savings in rupees.
+              Built a dashboard that turns cooling-tower sensor data into heat load, fouling and the
+              rupees lost to it, tower by tower.
             </p>
             <DimensionLine label="≈ 1 month" className="mt-5 max-w-sm" />
           </div>
@@ -214,7 +290,9 @@ function Experience() {
               <span className="font-mono text-xs text-sage">expected 2029</span>
             </div>
             <p className="mt-2 text-[0.9375rem] text-sage">Second year · Minor in Robotics</p>
-            <p className="mt-1 font-mono text-xs text-sage">JEE Advanced rank 1834</p>
+            <p className="mt-1 font-mono text-xs text-sage">
+              JEE Advanced rank <span className="text-copper">1834</span>
+            </p>
           </div>
         </div>
       </Reveal>
@@ -244,7 +322,7 @@ function Contact() {
             <li key={l.href}>
               <a
                 href={l.href}
-                className="font-mono text-base break-all text-ink underline decoration-brass/50 underline-offset-[6px] transition-colors duration-200 hover:decoration-brass sm:text-xl"
+                className="font-mono text-base break-all text-copper underline decoration-copper/40 underline-offset-[6px] transition-colors duration-200 hover:decoration-copper sm:text-xl"
                 {...(l.href.startsWith("http") ? { rel: "me noopener", target: "_blank" } : {})}
               >
                 {l.label}

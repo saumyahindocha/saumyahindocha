@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { AngleGuides } from "@/components/bench/AngleGuides";
 import { DimensionLine } from "@/components/bench/DimensionLine";
-import { PhotoPrint } from "@/components/bench/PhotoPrint";
-import { PodPoster } from "@/components/bench/PodPoster";
+import { BotPoster } from "@/components/bench/BotPoster";
 import { ProjectTile } from "@/components/bench/ProjectTile";
 import { Reveal } from "@/components/bench/Reveal";
 import { RulerStrip } from "@/components/bench/RulerStrip";
@@ -16,6 +15,7 @@ export default function Home() {
       <RulerStrip className="mt-6" />
       <WhatIDo />
       <Projects />
+      <Competitions />
       <Currently />
       <Experience />
       <RulerStrip start={12} className="mt-24" />
@@ -57,21 +57,9 @@ function Hero() {
       </div>
 
       <figure className="relative mx-auto w-full max-w-[480px] md:max-w-none">
-        <div className="relative">
-          <PodPoster className="h-auto w-full" />
-          <PhotoPrint
-            src="/media/pod-pico-above-screen.webp"
-            alt="The Pod's Pico 2 W mounted above its 2.8 inch screen, held in a hand."
-            width={560}
-            height={1008}
-            caption="Pico 2 W over the screen"
-            tilt={5}
-            priority
-            className="absolute top-[14%] right-[1%] w-[31%]"
-          />
-        </div>
+        <BotPoster className="h-auto w-full" />
         <figcaption className="mt-2 text-center text-xs text-sage-dim">
-          Pod, top view. An orbitable 3D model replaces this drawing in stage 3.
+          NIDS, side view. Tap it to give it a push. The live balance sim lands in stage 3.
         </figcaption>
       </figure>
     </section>
@@ -120,15 +108,23 @@ function Projects() {
           All projects
         </Link>
       </div>
-      <ul className="mt-10 grid items-start gap-8 md:grid-cols-2 md:gap-x-10 md:gap-y-12">
+      <ul className="mt-10 grid items-start gap-8 md:grid-cols-2 md:gap-x-10 md:gap-y-12 lg:grid-cols-3 lg:gap-x-8">
         {projects.map((p, i) => (
           <Reveal
             as="li"
             key={p.code}
-            delay={(i % 2) * 80}
-            className={i % 2 === 1 ? "md:mt-16" : ""}
+            delay={i === 0 ? 0 : ((i - 1) % 2) * 80}
+            className={
+              i === 0
+                ? "md:col-span-2 lg:col-span-3"
+                : i === 2
+                  ? "md:mt-16 lg:mt-12"
+                  : i === 3
+                    ? "lg:mt-6"
+                    : ""
+            }
           >
-            <ProjectTile project={p} />
+            <ProjectTile project={p} featured={i === 0} />
           </Reveal>
         ))}
       </ul>
@@ -139,17 +135,49 @@ function Projects() {
   );
 }
 
+// Placeholder until Saumya confirms the facts (year, team, what was built, result).
+const competitions = [
+  { silk: "C1", title: "XLR8", detail: "Details to come." },
+  { silk: "C2", title: "Aeromodelling competitions", detail: "Details to come." },
+];
+
+function Competitions() {
+  return (
+    <section aria-labelledby="competitions" className="mx-auto max-w-6xl px-5 pt-24 sm:px-8">
+      <Reveal>
+        <h2 id="competitions" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          Competitions
+        </h2>
+      </Reveal>
+      <ul className="mt-8 grid gap-6 sm:grid-cols-2">
+        {competitions.map((c, i) => (
+          <Reveal
+            as="li"
+            key={c.title}
+            delay={i * 80}
+            className="relative rounded-md border border-dashed border-line-strong p-6"
+          >
+            <Silk>{c.silk}</Silk>
+            <h3 className="mt-3 text-xl font-semibold tracking-tight">{c.title}</h3>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-sage">{c.detail}</p>
+          </Reveal>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function Currently() {
   const items = [
-    {
-      silk: "U1",
-      title: "Pod",
-      body: "Built on perfboard, touch working. Next: SD playback and Bluetooth tests, then the battery and charger.",
-    },
     {
       silk: "R7",
       title: "EE 617 research project",
       body: "An ongoing research project in sensors and instrumentation, under the course professor.",
+    },
+    {
+      silk: "U4",
+      title: "Pod",
+      body: "A pocket music player on a Pico 2 W, built on perfboard. Next: SD and Bluetooth tests.",
     },
   ];
   return (

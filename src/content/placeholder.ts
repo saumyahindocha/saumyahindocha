@@ -28,7 +28,8 @@ export const projects: ProjectTileData[] = [
     silk: "J1 · NIDS",
     slug: "nids-self-balancing-robot",
     title: "NIDS",
-    summary: "A two-wheeled self-balancing robot. I led a team of four.",
+    summary:
+      "A two-wheeled self-balancing robot. I led a team of four. It balanced unassisted for about 50 s and was exhibited at the ITSP 2026 showcase.",
     context: "ITSP 2026",
     status: "Built",
     headlines: [
@@ -36,7 +37,7 @@ export const projects: ProjectTileData[] = [
       { value: "+8.5 s⁻¹", label: "open-loop pole" },
       { value: "₹5.6–9.2k", label: "bill of materials" },
     ],
-    tilt: -0.6,
+    tilt: -0.4,
     media: {
       kind: "photo",
       src: "/media/nids-assembled.webp",
@@ -47,28 +48,6 @@ export const projects: ProjectTileData[] = [
   },
   {
     code: "SH-02",
-    silk: "U1 · POD",
-    slug: "pod",
-    title: "Pod",
-    summary: "A pocket music player on a Pico 2 W with Bluetooth and album art.",
-    context: "Personal",
-    status: "In progress",
-    headlines: [
-      { value: "240×320", label: "touch UI" },
-      { value: "57×115×24", label: "mm, device" },
-      { value: "52×109", label: "mm PCB, 2 layers" },
-    ],
-    tilt: 0.5,
-    media: {
-      kind: "photo",
-      src: "/media/pod-perfboard-underside.webp",
-      width: 800,
-      height: 957,
-      alt: "Underside of the Pod perfboard: solder bridges and red, yellow and black wire links.",
-    },
-  },
-  {
-    code: "SH-03",
     silk: "K3 · ANPR",
     slug: "station-parking",
     title: "Station Parking",
@@ -80,7 +59,7 @@ export const projects: ProjectTileData[] = [
       { value: "99.4%", label: "plates right when confident*" },
       { value: "87+134+31", label: "tests passing" },
     ],
-    tilt: 0.4,
+    tilt: -0.6,
     media: {
       kind: "photo",
       src: "/media/parking-dashboard-live.webp",
@@ -90,7 +69,7 @@ export const projects: ProjectTileData[] = [
     },
   },
   {
-    code: "SH-04",
+    code: "SH-03",
     silk: "P4 · SSF",
     slug: "ss-filters-energy-audit",
     title: "Cooling-tower energy audit",
@@ -102,8 +81,30 @@ export const projects: ProjectTileData[] = [
       { value: "28 °C", label: "design wet bulb" },
       { value: "3.517 kW", label: "per ton of refrigeration" },
     ],
-    tilt: -0.4,
+    tilt: 0.5,
     media: { kind: "drawing", name: "cooling-tower" },
+  },
+  {
+    code: "SH-04",
+    silk: "U1 · POD",
+    slug: "pod",
+    title: "Pod",
+    summary: "A pocket music player on a Pico 2 W with Bluetooth and album art.",
+    context: "Personal",
+    status: "In progress",
+    headlines: [
+      { value: "240×320", label: "touch UI" },
+      { value: "57×115×24", label: "mm, device" },
+      { value: "52×109", label: "mm PCB, 2 layers" },
+    ],
+    tilt: -0.4,
+    media: {
+      kind: "photo",
+      src: "/media/pod-perfboard-underside.webp",
+      width: 800,
+      height: 957,
+      alt: "Underside of the Pod perfboard: solder bridges and red, yellow and black wire links.",
+    },
   },
 ];
 
@@ -118,7 +119,7 @@ export const disciplines = [
     key: "E",
     title: "Electronics & PCB",
     tools: "EasyEDA · KiCad basics · perfboard",
-    example: "Pod PCB Rev A, 52 × 109 mm, two layers, DRC clean.",
+    example: "NIDS remote: a custom EasyEDA PCB for the NRF24L01 link, built on perfboard.",
   },
   {
     key: "C",

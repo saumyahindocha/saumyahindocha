@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { ModelKey, TileMedia } from "@/content/placeholder";
+import type { ModelKey, TileMedia } from "@/lib/types";
 import type { NidsHandle } from "@/three/NidsScene";
 import { CoolingTowerDrawing } from "./CoolingTowerDrawing";
 

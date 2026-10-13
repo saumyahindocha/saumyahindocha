@@ -1,9 +1,13 @@
-import type { Headline } from "@/content/placeholder";
+import type { CSSProperties } from "react";
+import type { Headline } from "@/lib/types";
 
 /** Headline numbers in a row. Numbers are always mono. */
 export function SpecStrip({ items, className = "" }: { items: Headline[]; className?: string }) {
   return (
-    <dl className={`grid grid-cols-3 gap-x-4 ${className}`}>
+    <dl
+      className={`grid gap-x-4 gap-y-4 ${items.length > 3 ? "grid-cols-2 sm:grid-cols-[repeat(var(--n),minmax(0,1fr))]" : "grid-cols-3"} ${className}`}
+      style={{ "--n": items.length } as CSSProperties}
+    >
       {items.map((h) => (
         <div key={h.label} className="flex min-w-0 flex-col-reverse">
           <dt className="mt-0.5 text-xs leading-snug text-sage">{h.label}</dt>

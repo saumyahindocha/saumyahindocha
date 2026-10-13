@@ -5,7 +5,8 @@ import { ProjectTile } from "@/components/bench/ProjectTile";
 import { Reveal } from "@/components/bench/Reveal";
 import { RulerStrip } from "@/components/bench/RulerStrip";
 import { Silk } from "@/components/bench/Silk";
-import { disciplines, projects } from "@/content/placeholder";
+import { disciplines } from "@/content/site";
+import { getProjects, toTile } from "@/lib/projects";
 
 export default function Home() {
   return (
@@ -82,6 +83,7 @@ function Hero() {
 const SPAN = ["md:col-span-7", "md:col-span-5", "md:col-span-6", "md:col-span-6"];
 
 function Projects() {
+  const projects = getProjects().map(toTile);
   return (
     <section aria-labelledby="projects" className="mx-auto max-w-6xl px-5 pt-20 sm:px-8">
       <div className="flex items-end justify-between gap-4">

@@ -1,0 +1,104 @@
+---
+title: Cooling-tower energy audit
+slug: ss-filters-energy-audit
+code: SH-03
+context: Internship
+dates: Jul 2026
+role: Intern, built the dashboard prototype (sole committer on the repo)
+team: []
+status: Built
+summary: A dashboard that turns cooling-tower sensor data into heat load, fouling and rupees lost.
+headline:
+- value: '15'
+  label: field devices modelled per tower
+- value: 15 s
+  label: telemetry cadence
+- value: '2'
+  label: simulated towers in the demo
+- value: ₹9.0/kWh
+  label: default tariff, editable live
+tags:
+- FastAPI
+- React
+- MongoDB
+- MQTT
+- three.js
+- TimescaleDB
+- Docker Compose
+- Recharts
+repo: https://github.com/saumyahindocha/SS-filters
+links:
+- label: Live demo (Render)
+  href: https://ss-filters.onrender.com
+media: []
+model: tower
+lessons:
+- The useful core of an energy dashboard is a few lines of physics; most of the work is getting clean,
+  tagged numbers to them.
+- Code from an AI app builder needs a deliberate pass to remove platform lock-in, such as hosted auth
+  and hosted assets, before it can run anywhere else.
+- When the dev data store and the production schema differ, the gap belongs in the backlog in writing,
+  not in someone's memory.
+tile:
+  silk: SSF
+  tilt: 0.5
+  cover:
+    kind: drawing
+    name: cooling-tower
+  headline:
+  - value: Jul 2026
+    label: about 1 month
+  - value: 28 °C
+    label: design wet bulb
+  - value: 3.517 kW
+    label: per ton of refrigeration
+areas:
+- Software
+- Thermal
+---
+
+## Why it exists
+
+SS Filters sells side-stream filtration for industrial cooling water. Their pitch is simple: fouling makes a cooling tower reject less heat, so the fans, pumps and chiller burn more power, and that power has a price. During my internship in July 2026 I built a dashboard that makes that price visible, tower by tower, in rupees.
+
+The target is a factory, not the cloud. Each tower gets its own field devices (a flow meter, RTDs, pressure sensors, a filter DP sensor, conductivity, turbidity, pH, ambient temperature and humidity, and three power meters). They report over Modbus RTU to a PLC, and an IoT gateway bridges that to MQTT on the factory LAN.
+
+The live demo is linked at the end of this page. It is hosted on Render and may take about 30 s to wake up on the first visit.
+
+## How it works
+
+The backend is a single FastAPI service with three background loops:
+
+- **Ingestion.** In the demo, an in-process simulator generates readings for two towers every 15 s, with fouling that slowly drifts upward. With `MQTT_ENABLED` set, it instead subscribes to `factory/towers/+/telemetry`. There is also a `POST /api/ingest` route for gateways that only speak HTTP. Every reading is stored with its `tower_id`, and each device's `last_seen` is updated.
+- **Analytics.** Every 60 s in dev, for each tower:
+  - Heat rejection `Q = ṁ·Cp·ΔT`, with `Cp = 4.186 kJ/kg·K`.
+  - Tower effectiveness, (return − supply) / (return − wet bulb).
+  - Specific power in kW/TR, with 1 TR = 3.517 kW.
+  - A fouling index from 0 to 1, a weighted sum of filter DP, conductivity, turbidity and pressure drop across the tower, graded Clean, Watch, Fouled or Critical at 0.35, 0.6 and 0.85.
+  - Hours to cleaning, from a linear fit of the last 6 h of fouling index.
+  - Excess power against a per-tower baseline line (slope × TR load + intercept), multiplied by the tariff to give rupees lost per interval and a running total.
+- **Staleness and alerts.** A device that has not reported for 90 s raises an offline alert. Fouling breaches and excess power above 25 kW raise alerts too, deduplicated over 5 minutes.
+
+The React frontend has a multi-tower overview, a per-tower page with sensor tiles, power tiles, a power-vs-time chart with the baseline overlaid, a fouling panel and the rupee counter, plus an alerts table and a tariff dialog. A Process page uses three.js to show the full heat path, from server racks through the chiller and condenser to the cooling tower, and lists the audit kit.
+
+## The build
+
+The repo was generated with Emergent, an AI app-building platform. Its fingerprints are clear: an `.emergent/` folder, a `test_result.md` protocol for its main and testing agents, and an automated smoke-test report in `test_reports/`. That report records every backend endpoint group and every frontend page passing, including the tariff dialog changing the top bar to ₹11.25/kWh.
+
+The production path is written down but not yet proven on a real plant. `docker-compose.yml` brings up Mosquitto, TimescaleDB, MongoDB, the backend, the Nginx-served frontend and an optional MQTT publisher simulator. A TimescaleDB schema with hypertables for readings and analytics is included. No real PLC has been wired to it yet.
+
+The top-level `README.md` is still a placeholder ("Here are your Instructions"), and `frontend/README.md` is the default Create React App file. The best description of the system lives in `memory/PRD.md` and `on-prem/README.md`.
+
+## What broke and how I fixed it
+
+The repo has a single commit, dated 9 July 2026, so there is no build log to quote. What the code does record:
+
+- **Platform-locked login.** The generated app used Emergent's hosted Google sign-in, which only works inside their environment. The commit removes the auth wrappers from the frontend and opens the dashboard routes. The backend still carries the old `/api/auth/*` routes, and `frontend/src/lib/auth.jsx` is still in the tree but unused. Removing both is open work.
+- **Two data stores.** The app runs on MongoDB, while the on-prem plan targets TimescaleDB. The schema is there, but the backend does not write to it yet. A Mongo-to-Timescale adapter is listed as a P1 backlog item.
+- **A hosted logo.** The SS Filters logo is loaded from Emergent's asset CDN, not from the repo. That has to move into the repo before an offline factory install.
+
+Still in the backlog: CSV export, SMS and email alerts, a baseline re-fit tool, a side-by-side tower comparison view, and role-based auth for the LAN.
+
+## What I took away
+
+A short list of what this internship taught me about turning a generated prototype into something a plant could actually run.

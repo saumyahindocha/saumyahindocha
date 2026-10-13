@@ -1,4 +1,4 @@
-import type { Status } from "@/content/placeholder";
+import type { Status } from "@/lib/types";
 
 const styles: Record<Status, string> = {
   Built: "border-brass/70 text-brass",

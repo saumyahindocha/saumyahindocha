@@ -1,0 +1,128 @@
+---
+title: Pod
+slug: pod
+code: SH-04
+context: Personal
+dates: Sep 2026–present
+role: 'Solo build: hardware choices, wiring, PCB and perfboard layout, testing; firmware written with
+  AI coding agents and reviewed by me'
+team: []
+status: In progress
+summary: 'A Pico 2 W music player: iPhone Bluetooth audio, an SD card player and a touch Now Playing screen.'
+headline:
+- value: 240×320
+  label: touch UI on a 2.8" SPI screen
+- value: ~57 × 115 × 24 mm
+  label: planned device size (PCB version)
+- value: 52 × 109 mm
+  label: PCB Rev A, 2 layers, DRC clean
+- value: 1000 mAh
+  label: LiPo, planned (not fitted yet)
+tags:
+- Raspberry Pi Pico 2 W
+- C
+- Pico SDK
+- BTstack
+- I2S audio
+- EasyEDA Pro
+- GitHub Actions
+- Perfboard
+repo: https://github.com/saumyahindocha/iPOD
+links: []
+media:
+- alt: 'Underside of the Pod perfboard: solder bridges and red, yellow and black wire links.'
+  caption: The perfboard build, underside
+  src: /media/pod-perfboard-underside.webp
+  width: 800
+  height: 957
+- alt: 'Six Pod screens rendered on a PC: home screen with Phone and SD card buttons, SD library, Now
+    Playing, volume slider, low-battery warning, library with a selected song'
+  caption: Home, library, Now Playing, volume and low battery, rendered by the firmware's PC preview
+  src: /media/pod/ui_screens_sd.webp
+  width: 1490
+  height: 320
+- alt: 'Three Poster Now Playing screens: waiting for phone, playing with placeholder album art, and a
+    paused long title'
+  caption: 'The Poster Now Playing layout: full-bleed art fading into an accent colour'
+  src: /media/pod/ui_preview_poster.webp
+  width: 1536
+  height: 704
+- alt: To-scale top view of the 52 by 109 mm PCB with the Pico 2 W at the top, antenna cut-out, screen
+    sockets, SD keep-out, USB-C and headphone jack
+  caption: PCB Rev A layout plan, to scale
+  src: /media/pod/pcb_layout_pico.webp
+  width: 1100
+  height: 1142
+model: pod
+lessons:
+- 'Print raw sensor readings on the device itself before trusting a calibration: that is how I found an
+  open solder link that the touch setup had happily accepted.'
+- 'Get a fab quote before treating a PCB as the next step: the roughly $90 assembled quote turned a finished
+  Rev A into a perfboard build with the same layout and pins.'
+- 'Pick the pin map for the way you will build: re-mapping GPIOs so 7 screen pins sit under their Pico
+  pins cut the on-board wires from 18 to 11.'
+tile:
+  silk: POD
+  tilt: -0.4
+  cover:
+    kind: photo
+    src: /media/pod-perfboard-underside.webp
+    width: 800
+    height: 957
+    alt: 'Underside of the Pod perfboard: solder bridges and red, yellow and black wire links.'
+  headline:
+  - value: 240×320
+    label: touch UI
+  - value: 57×115×24
+    label: mm, device
+  - value: 52×109
+    label: mm PCB, 2 layers
+areas:
+- Electronics
+- Embedded
+- Software
+---
+
+## Why it exists
+
+I wanted a small, dedicated music player that feels like a modern iPod: stream from my iPhone over Bluetooth, play my own MP3s from an SD card, and show the album art on a proper screen instead of a two-line LCD.
+
+The core requirement was Bluetooth A2DP, so the phone sends audio and Pod plays it through a hi-fi DAC into headphones. That one requirement shaped the first big decision.
+
+## How it works
+
+- **Controller:** Raspberry Pi Pico 2 W. I first planned an ESP32-S3, then dropped it because it has no Bluetooth Classic, which A2DP needs.
+- **Audio:** an Adafruit PCM5102 I2S DAC on `GP13` (DIN), `GP14` (BCK) and `GP15` (WSEL). WSEL must be BCK + 1 because the PIO side-set pins are consecutive.
+- **Screen:** a 2.8" 240×320 ILI9341 display with XPT2046 resistive touch and a microSD slot, all sharing SPI0. The display's SDO line stays disconnected so it does not corrupt touch readings.
+- **Battery:** a divider on `GP28` read by the firmware, with an optional MAX17048 fuel gauge. A battery icon shows the level and a "Battery low" warning appears below 15 %.
+
+The main firmware is C on the Pico SDK with BTstack. A home screen picks the source:
+
+- **Phone:** the iPhone pairs with "Pod". The firmware adds software volume synced with the phone, sample-rate handling for 44.1 and 48 kHz, and album art downloaded over AVRCP Cover Art.
+- **SD card:** MP3 and WAV playback with a touch library browser, tags and cover art, drag-to-seek and auto-advance through a folder.
+
+The "Poster" Now Playing screen draws on the second core, so core 0 keeps Bluetooth and audio. Every push runs a GitHub Actions build that publishes the `.uf2` files, which I flash by drag-and-drop. I write much of this firmware with AI coding agents and review it; the hardware choices, wiring and testing are mine.
+
+## The build
+
+The story so far, from the dated build log:
+
+1. **Breadboard (26 Sep to 7 Oct 2026).** I wired the display, touch and DAC on a breadboard and brought each part up with small Arduino sketches. A 440 Hz tone confirmed the I2S wiring. Then the iPhone paired with "Pod" and streamed Spotify through the DAC to headphones, which met the core requirement.
+2. **Firmware on PC (7 Oct).** The home screen, SD player and battery gauge were built and tested on a PC first. The track reader was checked against CBR and VBR MP3, ID3v2.3/2.4 tags and 16/24-bit WAV, and a PC preview renders the screens.
+3. **PCB Rev A (7 to 8 Oct).** The first plan was a bare RP2350A with a separate radio on a 4-layer board. I switched to soldering my Pico 2 W onto the board instead, which removed the chip, flash, crystal and regulator design and allowed 2 layers. I drew it in EasyEDA Pro: four schematic sheets, a 52 × 109 mm board, GND pours on both layers and a 9 × 14 mm antenna cut-out. DRC was clean apart from the expected notch item, and I exported the Gerbers, a 23-line BOM and pick-and-place.
+4. **Perfboard (8 to 10 Oct).** The JLCPCB quote for the assembled board was about $90, too much for one prototype, so the PCB design stays in the repo and I built the same layout on perfboard. I soldered it in one night, and the firmware now boots to the home screen with touch working, powered over USB.
+
+Still to do: SD playback and phone streaming on the perfboard, and the TP4056 charger, switch and battery, which have not been fitted yet. The album-art firmware compiles and renders on a PC, but its hardware test is still pending in the log.
+
+## What broke and how I fixed it
+
+- **Swapped pins (26 Sep, 7 Oct).** Display RESET and touch T_DO were swapped on the breadboard. Later, MOSI sat on `GP21`, which is not a valid SPI0 data pin, so I moved it.
+- **Touch needed a hard press (7 Oct).** The touch library has a fixed pressure cutoff of 300. I wrote `PodTouch`, a driver with an adjustable threshold (60 after testing), extra averaging and calibration built in.
+- **Compiler kept breaking (7 Oct).** The laptop's antivirus removed parts of the toolchain, so all compiling moved to GitHub Actions.
+- **Schematic review (7 Oct).** On the power sheet, charger pins were unconnected, the two 22 µF output capacitors were in series and the gauge's 1 µF capacitor was missing.
+- **Gerber outline (8 Oct).** A stray 6.35 mm line from the jack footprint sat 2.2 mm inside the bottom edge. The fab would have milled it as a slot, so I removed it from the outline file.
+- **Touch read nothing (10 Oct).** On the finished perfboard, the pressed signal worked but every reading was all 0 or all 8191, and the setup dots accepted the garbage. Printing the raw readings on the screen pointed to the data line: the link from `GP4` to T_DO (holes F8 to F10) was open. Resoldering it fixed touch. I also hardened the firmware: MISO pulled up, readings above 4095 rejected as "line open", and a new calibration magic so the old breadboard calibration is ignored.
+
+## What I took away
+
+Pod taught me as much about debugging and planning as about audio.

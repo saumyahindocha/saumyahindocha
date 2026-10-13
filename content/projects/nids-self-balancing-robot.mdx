@@ -1,0 +1,143 @@
+---
+title: NIDS
+slug: nids-self-balancing-robot
+code: SH-01
+context: ITSP 2026
+dates: May–Aug 2026
+role: Team lead
+team:
+- Saumya Hindocha (team lead)
+- Nimay Shah (team member)
+- Divit Ghorpade (team member)
+- Ira Krishnan (team member)
+- Avaneesh Khadye (mentor)
+- Ayush Lokandi (mentor)
+status: Built
+summary: An Arduino Mega inverted pendulum on wheels that balanced unassisted for about 50 s at ITSP 2026.
+headline:
+- value: ~50 s
+  label: unassisted balance, on video
+- value: +8.5 s⁻¹
+  label: open-loop unstable pole (~0.12 s to fall)
+- value: 450.47 / 800.91 / 100
+  label: MATLAB-tuned Kp / Ki / Kd
+- value: ₹5.6–9.2k
+  label: estimated cost of parts in use
+tags:
+- Arduino
+- C++
+- PID control
+- Kalman filter
+- MATLAB
+- Fusion 360
+- EasyEDA
+- NRF24L01
+repo: https://github.com/saumyahindocha/self-balancing-bot
+links: []
+media:
+- alt: The robot standing on its own on a tiled floor until it is nudged
+  caption: Balancing unassisted for about 50 s
+  video: /media/nids-self-balancing-robot/balancing-unassisted.mp4
+  src: /media/nids-self-balancing-robot/balancing-unassisted.webp
+  width: 480
+  height: 854
+- alt: Three-tier acrylic robot on a desk next to a laptop showing the Serial Monitor
+  caption: Assembled robot during PID bring-up, 18 Aug 2026
+  src: /media/nids-self-balancing-robot/assembled-robot-2026-08-18.webp
+  width: 1280
+  height: 960
+- alt: Fusion 360 model of the two-wheeled robot with stacked plates on threaded rods
+  caption: Robot CAD in Fusion 360
+  src: /media/nids-self-balancing-robot/cad-robot-fusion360.webp
+  width: 720
+  height: 1280
+- alt: Copper and silkscreen layers of the remote PCB rendered from Gerbers
+  caption: Remote PCB, rendered from the Gerbers (EasyEDA Pro, 26 May 2026)
+  src: /media/nids-self-balancing-robot/remote-pcb-layers.webp
+  width: 1600
+  height: 379
+- alt: Fusion 360 model of the pistol-grip remote with joystick, PCB and 9 V holder
+  caption: Remote enclosure CAD
+  src: /media/nids-self-balancing-robot/cad-remote-fusion360.webp
+  width: 1280
+  height: 719
+- alt: 3D-printed black pistol-grip remote enclosure held in one hand
+  caption: 3D-printed pistol-grip enclosure
+  src: /media/nids-self-balancing-robot/remote-enclosure-print.webp
+  width: 960
+  height: 1280
+model: nids
+lessons:
+- A pitch-only PID on a wheeled pendulum cannot hold position, because the plant's zero at s = 0 cancels
+  the integrator; encoders and an outer loop are the real fix.
+- Cutting scope to balance only on 18 Aug gave us one problem to solve, and the robot balanced in time
+  for the showcase.
+- 'Write down the gains that worked on the day: ours were never recorded, so the firmware still holds
+  starting values.'
+tile:
+  silk: NIDS
+  tilt: -0.4
+  cover:
+    kind: photo
+    src: /media/nids-assembled.webp
+    width: 900
+    height: 794
+    alt: 'The NIDS robot on a bench: three acrylic plates on threaded rods, two wheels, motor driver and
+      LiPo on top.'
+  headline:
+  - value: ~50 s
+    label: unassisted balance
+  - value: +8.5 s⁻¹
+    label: open-loop pole
+  - value: ₹5.6–9.2k
+    label: bill of materials
+areas:
+- Mechanical
+- Electronics
+- Controls
+- Embedded
+---
+
+## Why it exists
+
+NIDS was our Institute Technical Summer Project (ITSP) 2026 at IIT Bombay, in the mechatronics domain. I led a team of four: Nimay Shah, Divit Ghorpade, Ira Krishnan and me, with Avaneesh Khadye and Ayush Lokandi as mentors.
+
+A two-wheeled self-balancing robot is a small, honest control problem. Left alone, its fall has a time constant of about 0.12 s, so sensing, filtering, control and the motor drive all have to work together before anything looks right.
+
+We started from an IIT Delhi summer-internship report on a two-wheeled path-following self-balancing robot by R. Kishore, supervised by Prof. Subashish Datta. The mechanical layout, dynamic model, Kalman filter, IR rule table and the motor and IMU pins come from that report. We moved the IR pins, added the NRF pins and the wireless override, and rewrote the firmware.
+
+## How it works
+
+The loop is sense, decide, act:
+
+- **Sense.** An MPU6500 on I2C at 400 kHz gives acceleration and gyro rate. Pitch from the accelerometer (`atan2`) is fused with the gyro in a two-state Kalman filter (angle and gyro bias).
+- **Decide.** PID on the pitch error, with the integral clamped to ±5000. Beyond ±17.5° the robot drives at full power back towards upright. Beyond ±35° it counts as fallen and stops.
+- **Act.** An L298N drives two 12 V planetary gear motors. They have no encoders and do not turn below a certain PWM, so `applyDeadzone()` remaps small commands above that threshold. Both wheels get the same command, since the robot only balances.
+
+The control design follows a linearised Euler-Lagrange model of an inverted pendulum on wheels, with states p, ṗ, θ, θ̇ and motor voltage as the input. It has an open-loop pole at about +8.5 s⁻¹, a time constant of about 0.12 s. We tuned the PID in MATLAB to Kp = 450.47, Ki = 800.91, Kd = 100. Rebuilding the model in `matlab/balance_model.m` gives closed-loop poles at −172.3 and −2.04 ± 1.83j: stable, with a ~17 ms rise but an ~8 % steady offset.
+
+## The build
+
+- **Chassis:** three 230 × 100 × 6 mm laser-cut acrylic plates on M6 rods, cut on 24 Jun 2026. Motors on the bottom, the Arduino Mega and L298N in the middle, a 3S LiPo on top. The plate SVGs use 230 mm, from Section 4.1, because the report's plate sizes disagree with each other.
+- **Drive:** 100 mm wheels, with the LiPo powering the motors and USB powering the logic.
+- **Bench tests:** one sketch per subsystem (IMU, IR, L298N, dead zone, motor direction, NRF link) before any balancing code.
+
+The first design also had IR line following and a handheld NRF24L01 remote with an IR/manual mode switch. I designed the remote's PCB in EasyEDA in May 2026: an Arduino Nano, a KY-023 joystick and an NRF24L01+PA+LNA on 9 V, in a pistol-grip enclosure designed in Fusion 360 and 3D-printed in June. The mentor verified the board, but it was never fabricated; we built the same circuit on perfboard instead. On 18 Aug we shelved both the remote and line following to focus on balance. Their code is archived in the repo.
+
+After that, the robot balanced unassisted for about 50 seconds on video, and we exhibited it at the ITSP 2026 showcase. The gains used for that run were not recorded, so `firmware/balance` still holds the starting values from the tuning guide.
+
+I own the engineering: hardware choices, wiring, mechanical design and testing. I write much of the firmware with AI coding agents and review it.
+
+## What broke and how I fixed it
+
+- **Pin clash (2 Jun).** The report's code put the IR sensors on Mega pins 49, 51 and 53, but 51 and 53 are SPI pins the NRF needs. We moved the IR sensors to 30/32/34 and put the NRF on CE 48 / CSN 49.
+- **Missing library (2 Jun).** The Bolder Flight `mpu6500` library was not in the Library Manager, so we ported the IMU code to FastIMU.
+- **A frozen loop (20–21 Jun).** The mode-button debounce used `delay(300)`, which froze the balance loop. The rewrite debounces without blocking, clamps the integral and guards against `dt = 0`.
+- **Motors silent (9 Aug).** The dead-zone sketch printed PWM values but the motors did not turn. A photo pointed to the ENA/ENB jumpers still fitted and OUT3/OUT4 looking empty. Neither was confirmed afterwards.
+- **Zero error (18 Aug).** PWM did not change with pitch. The suspected cause was `targetAngle` set to the 1.5° rest reading, making the error zero. We reset it to 0 and dropped to Kp = 30. The motors still did not respond to the PID's PWM that night; that was never explained.
+- **Mirrored motors (18 Aug).** A direct ±150 test spun the wheels in opposite directions, and negating the left speed stopped it instead of reversing it. The fix is to swap the left motor's wires or set `LEFT_MOTOR_REVERSED`.
+- **Calibration never applied (8 Oct).** `calibrateAccelGyro(200)` passed 200 as a pointer, and `-fpermissive` hid the error, so the IMU biases were never used. It now passes `&calib` and calls `init(calib)`.
+
+## What I took away
+
+Three things I would carry into the next robot:

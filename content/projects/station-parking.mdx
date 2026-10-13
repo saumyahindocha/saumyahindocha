@@ -1,0 +1,129 @@
+---
+title: Station Parking
+slug: station-parking
+code: SH-02
+context: Software
+dates: Sep–Oct 2026
+role: System design, requirements and review; code written with an AI coding agent
+team: []
+status: Pilot-ready
+summary: 'ANPR parking system for a railway-station bike lot: bikes are never stopped, workers collect
+  UPI in the lot.'
+headline:
+- value: ~3,000
+  label: entries and exits a day, each way (design load)
+- value: 78%
+  label: plates fully right from one frame, held-out generated plates
+- value: 99.4%
+  label: right when the reader is confident, held-out generated plates
+- value: 5 of 6
+  label: plates read on demo gate videos, 0 wrong
+- value: 87 + 134 + 31
+  label: 'tests passing: backend, ANPR, alert unit'
+tags:
+- Python
+- FastAPI
+- PostgreSQL
+- React + TypeScript
+- Flutter
+- ONNX Runtime
+- Raspberry Pi 5
+- Docker
+repo: https://github.com/saumyahindocha/Car-parking-software
+links: []
+media:
+- alt: Admin dashboard live view with vehicles inside, revenue split by UPI and cash, movements per gate
+    per hour, camera read rates and the latest plate events, all from simulated traffic
+  caption: Live view during a simulated day (demo data)
+  src: /media/station-parking/live.webp
+  width: 1600
+  height: 900
+- alt: Review queue showing an ambiguous exit read with the plate crop, the full camera frame, an overview
+    frame and four candidate plates matched against open sessions
+  caption: 'Review queue: an ambiguous read with its candidates (synthetic plates)'
+  src: /media/station-parking/review.webp
+  width: 1600
+  height: 900
+- alt: Cash control page with cash collected, handed over and deposited, per-worker cash in hand against
+    a limit, a pending handover and a worker comparison table
+  caption: 'Cash control: two-party handovers and per-worker limits (demo data)'
+  src: /media/station-parking/cash.webp
+  width: 1600
+  height: 900
+- alt: Reports page showing daily revenue split into walk-in UPI, walk-in cash and passes, with a bar
+    chart and a summary row
+  caption: 'Reports: daily revenue, UPI vs cash (demo data)'
+  src: /media/station-parking/reports.webp
+  width: 1600
+  height: 900
+model: gate
+lessons:
+- A score on generated test plates is a starting point, not a promise; real footage from the site decides
+  what the reader is worth.
+- Rehearsing the full install from scratch found faults, like a GPU-only stack and backups tied to the
+  host, that unit tests never would have.
+- Keeping money in an append-only ledger, in integer paise, made every later feature (dues, refunds, cash
+  variance) a matter of adding entries rather than editing history.
+tile:
+  silk: ANPR
+  tilt: -0.6
+  cover:
+    kind: photo
+    src: /media/parking-dashboard-live.webp
+    width: 1100
+    height: 650
+    alt: 'Station Parking dashboard, live view: vehicles inside, revenue, cash, review queue and movements
+      per gate per hour.'
+  headline:
+  - value: ~3,000
+    label: movements a day, each way
+  - value: 99.4%
+    label: plates right when confident*
+  - value: 87+134+31
+    label: tests passing
+areas:
+- Software
+- Computer vision
+- Embedded
+---
+
+## Why it exists
+
+A two-wheeler lot next to a railway station sees about 3,000 entries and 3,000 exits a day, with 400 to 500 movements an hour at the commuter peaks. Stopping each bike at a booth for a ticket does not work at those rates. The goal was a system where vehicles are never stopped: cameras read the plate on the move, workers walk the lot and collect payment, and the charge settles on the actual time parked.
+
+It also had to be honest about money. Cash is the easiest place for leaks, so the design is UPI first, with a controlled cash path, digital receipts for every payment and a ledger nobody can quietly edit.
+
+## How it works
+
+- **ANPR edge service.** One process per camera finds plates, tracks bikes side by side and reads one- and two-row plates. Each plate is seen in 5 to 15 frames by two cameras per gate; the service votes across frames and merges the two cameras into one event. It runs on a CPU, no GPU.
+- **Our own plate models.** No paid recogniser and no downloaded dataset. A generator draws Indian plates (HSRP, old style, commercial, EV, BH series) and then damages them with dirt, glare, blur and night IR. On that data we train a plate finder (~0.2 M parameters) and a whole-plate reader (~1.25 M parameters), both run with ONNX Runtime.
+- **Backend.** FastAPI and PostgreSQL 16. Sessions, a pure tariff engine (default: ₹10 for the first 2 h, ₹5 per started extra hour, a 10 min grace, a cap per 12 h block), passes, UPI and cash payments, disputes and reports. Money is stored in integer paise in an append-only ledger; corrections are new entries with a reason.
+- **Dashboard.** React and TypeScript, for supervisors: live gates, a review queue for unread plates, cash control and reports.
+- **Worker app.** Flutter, for workers, guards and supervisors. It works in a phone browser (tried on iPhone) or as an Android app, and keeps a SQLite queue so it keeps working when Wi-Fi drops. It carries a Dart port of the tariff engine for offline quotes.
+- **Exit alert unit.** A Raspberry Pi 5 per exit drives a screen, a red/green tower light and a buzzer. Red means the bike is leaving with dues.
+- **Deployment.** A one-command installer, site HTTPS, nightly backups with a restore test, and a health check script.
+
+## The build
+
+I worked on this alone, with an AI coding agent (Claude) writing the code across sessions from the specification. The commit history shows it in order: backend core and a 3,000-vehicle full-day simulator on 26 September 2026, then the dashboard, worker app, alert unit and site HTTPS the same day. The plate generator and models came on 27 September, the install rehearsal and its fixes the same day, a `try_video.py` tool for real phone footage on 28 September, and the site handbook on 13 October.
+
+My part was the engineering decisions and the review: what the lot actually needs, what happens when the internet or a camera drops, how cash is controlled, and what counts as done. The agent wrote the code; I own the system and checked it.
+
+On held-out computer-generated plates the reader gets 78% of plates fully right from a single frame, and 99.4% when its confidence is at least 0.7. On demo gate videos drawn by a different program it reads 5 of 6 plates with no wrong reads. None of this has been tested on real plates yet. The plan to reach 95% by day and 90% at night is a week of real footage on site, a correction pass and a retrain.
+
+Status: ready for a pilot at one gate, not yet ready to run unattended. The full install has been rehearsed from scratch with every health check passing, including a real backup and restore. Real plates, real UPI payments (needs a Razorpay account) and SMS receipts (needs MSG91) can only be proven on site.
+
+## What broke and how I fixed it
+
+All from the commit log, 27 September 2026.
+
+- **Long plates split into two bikes.** Long one-row plates could light up two peaks in the plate finder, so one bike became two tracks. Overlapping boxes on one text line are now merged.
+- **No GPU, no stack.** The first full install failed on a machine without an NVIDIA GPU. CPU is now the default and GPU is an add-on, since our plate models run on the CPU.
+- **Too much CPU, slow events.** The plate finder ran on every frame with 2 threads per camera. It now runs on motion or every 5th frame with 1 thread. Rehearsal CPU went from 392% to about 160%, and 95th-percentile event latency from 4.5 s to 0.8 s.
+- **Privacy clean-up could not delete images.** The ANPR service and the backend ran as different users. Both now run as uid 1001.
+- **Backups depended on the host.** They needed a host `pg_dump` matching the server version. Backup, restore and verify now use the tools inside the database container.
+- **Phone app missing from Docker installs.** The installer now downloads it and the backend serves it from a mounted folder.
+
+## What I took away
+
+Three things I would carry into the next system I design:

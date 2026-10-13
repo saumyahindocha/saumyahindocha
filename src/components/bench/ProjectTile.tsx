@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import type { ProjectTileData } from "@/content/placeholder";
+import type { ProjectTileData } from "@/lib/types";
 import { ModelWindow } from "./ModelWindow";
 import { Silk } from "./Silk";
 import { StatusChip } from "./StatusChip";
@@ -26,7 +26,7 @@ export function ProjectTile({ project }: { project: ProjectTileData }) {
 
       <header className="flex items-start justify-between gap-3 pl-2">
         <Silk>
-          {project.code} <span className="text-sage-dim">/</span> {project.silk.split(" · ")[1]}
+          {project.code} <span className="text-sage-dim">/</span> {project.silk}
         </Silk>
         <StatusChip status={project.status} />
       </header>

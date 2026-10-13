@@ -1,0 +1,60 @@
+{
+  "name": "Saumya Hindocha",
+  "position": "Mechanical Design & Robotics",
+  "contact": [
+    { "label": "saumyahindocha@gmail.com", "href": "mailto:saumyahindocha@gmail.com" },
+    { "label": "25b2218@iitb.ac.in", "href": "mailto:25b2218@iitb.ac.in" },
+    { "label": "github.com/saumyahindocha", "href": "https://github.com/saumyahindocha" }
+  ],
+  "education": [
+    {
+      "title": "B.Tech Mechanical Engineering, IIT Bombay",
+      "when": "expected 2029",
+      "lines": ["Second year · Minor in Robotics", "JEE Advanced rank 1834"],
+      "pdfOnly": ["CPI 7.53"]
+    }
+  ],
+  "experience": [
+    {
+      "title": "Intern, SS Filters",
+      "when": "July 2026",
+      "lines": [
+        "Built a real-time energy-audit dashboard for cooling towers: heat load, efficiency, fouling and savings in rupees."
+      ]
+    }
+  ],
+  "competitions": [{ "title": "XLR8", "when": "First year", "lines": [] }],
+  "coursework": [
+    "EE 617 Sensors & Instrumentation (research project, ongoing)",
+    "ME 225 Numerical Linear Algebra",
+    "ME 209 Thermodynamics"
+  ],
+  "skills": [
+    { "group": "Mechanical", "items": ["Fusion 360"] },
+    {
+      "group": "Electronics",
+      "items": ["EasyEDA Pro", "KiCad (basic)", "Perfboard prototyping and soldering"]
+    },
+    {
+      "group": "Embedded",
+      "items": [
+        "Raspberry Pi Pico SDK (C)",
+        "Arduino (C++)",
+        "I2S, SPI, I2C",
+        "Bluetooth A2DP/AVRCP"
+      ]
+    },
+    { "group": "Controls", "items": ["MATLAB (Control System Toolbox)", "PID", "Kalman filtering"] },
+    {
+      "group": "Software",
+      "items": [
+        "Python, FastAPI",
+        "PostgreSQL, MongoDB",
+        "React, TypeScript",
+        "Flutter",
+        "GitHub Actions CI",
+        "AI-assisted development"
+      ]
+    }
+  ]
+}

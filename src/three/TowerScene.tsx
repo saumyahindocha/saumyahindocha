@@ -2,15 +2,23 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, OrbitControls } from "@react-three/drei";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 
 /*
   A mechanical-draft cooling tower for the SS Filters tile: hot water sprays down through
   the fill, the fan pulls air up, cold water collects in the basin. Illustrative geometry
-  (the repo has no tower dimensions). The live numbers come with the stage-3 model, which
-  uses the constants in backend/server.py.
+  (the repo has no tower dimensions). On the project page `drive` links it to the
+  live model in src/sims/tower: the fill and basin water dirty with fouling, the
+  fan follows the load and the water falls with the flow.
 */
+
+export type TowerDrive = { fouling: number; load: number; flowFrac: number };
+
+const FILL_CLEAN = new THREE.Color("#a9bda4");
+const FILL_FOULED = new THREE.Color("#7a5a32");
+const WATER_CLEAN = new THREE.Color("#5fb3d9");
+const WATER_FOULED = new THREE.Color("#6f7a52");
 
 const DROPS = 260;
 const TOP = 2.1; // spray header height
@@ -39,27 +47,38 @@ const fill = new THREE.MeshStandardMaterial({
   opacity: 0.35,
 });
 
-export function TowerScene({ active, reducedMotion }: { active: boolean; reducedMotion: boolean }) {
+export function TowerScene({
+  active,
+  reducedMotion,
+  drive,
+  interactive = false,
+}: {
+  active: boolean;
+  reducedMotion: boolean;
+  drive?: RefObject<TowerDrive>;
+  interactive?: boolean;
+}) {
   return (
     <Canvas
       dpr={[1, 1.5]}
       frameloop={active && !reducedMotion ? "always" : "demand"}
-      camera={{ position: [5.2, 3.4, 6.0], fov: 30 }}
+      camera={{ position: drive ? [6.4, 3.9, 7.4] : [5.2, 3.4, 6.0], fov: 30 }}
       gl={{ antialias: true, alpha: true }}
-      style={{ touchAction: "pan-y" }}
+      style={{ touchAction: interactive ? "none" : "pan-y" }}
     >
       <hemisphereLight args={["#f6f1df", "#0c241a", 0.8]} />
       <directionalLight position={[3, 5, 3]} intensity={1.4} />
       <Environment resolution={64}>
         <Lightformer form="rect" intensity={2} position={[0, 4, 2]} scale={[6, 2, 1]} />
       </Environment>
-      <Tower />
+      <Tower drive={drive} />
       <OrbitControls
         target={[0, 1.4, 0]}
         enablePan={false}
         enableZoom={false}
-        enableRotate={false}
-        autoRotate={!reducedMotion}
+        enableRotate={interactive}
+        enableDamping
+        autoRotate={!reducedMotion && !drive}
         autoRotateSpeed={0.8}
       />
     </Canvas>
@@ -78,7 +97,7 @@ function makeDrops() {
   }));
 }
 
-function Tower() {
+function Tower({ drive }: { drive?: RefObject<TowerDrive> }) {
   const fan = useRef<THREE.Group>(null);
   const drops = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -86,11 +105,21 @@ function Tower() {
 
   useFrame((_, dt) => {
     const d = Math.min(dt, 1 / 30);
-    if (fan.current) fan.current.rotation.y += d * 6;
+    const live = drive?.current;
+    if (fan.current) fan.current.rotation.y += d * 6 * (live ? live.load / 0.7 : 1);
+    if (live) {
+      fill.color.lerpColors(FILL_CLEAN, FILL_FOULED, live.fouling);
+      water.color.lerpColors(WATER_CLEAN, WATER_FOULED, live.fouling * 0.85);
+    } else {
+      // The materials are shared with the tile, so put them back to clean.
+      fill.color.copy(FILL_CLEAN);
+      water.color.copy(WATER_CLEAN);
+    }
+    const flow = live ? live.flowFrac : 1;
     const m = drops.current;
     if (!m) return;
     seeds.forEach((s, i) => {
-      s.y -= s.v * d;
+      s.y -= s.v * d * flow;
       if (s.y < BASIN) s.y = TOP;
       dummy.position.set(s.x, s.y, s.z);
       dummy.scale.set(1, 2.4, 1);

@@ -8,6 +8,7 @@ import { NidsLab } from "@/components/sims/NidsLab";
 import { RemotePcb } from "@/components/sims/RemotePcb";
 import { GateLab } from "@/components/sims/GateLab";
 import { ArchDiagram } from "@/components/sims/ArchDiagram";
+import { TowerLab } from "@/components/sims/TowerLab";
 import type { ModelKey } from "@/lib/types";
 import { ModelWindow } from "@/components/bench/ModelWindow";
 import { Silk } from "@/components/bench/Silk";
@@ -49,6 +50,19 @@ const LAB: Partial<Record<ModelKey, React.ReactNode>> = {
       <div className="mt-10">
         <ArchDiagram />
       </div>
+    </>
+  ),
+  tower: (
+    <>
+      <TowerLab />
+      <p className="mt-4 max-w-[70ch] text-xs leading-relaxed text-sage-dim">
+        A client-side port of the dashboard&apos;s backend: the sensor simulator and the analytics
+        in <code>backend/server.py</code>, with tower CT-01&apos;s design values, its baseline of
+        0.17 kW per TR + 4 kW, and the default ₹9/kWh tariff. Heat is ṁ·Cp·ΔT, effectiveness is
+        range over range-plus-approach, and the fouling index weighs filter ΔP, conductivity,
+        turbidity and tower ΔP. The sensors are simulated, as they are in the original. Dashed lines
+        mark the backend&apos;s watch, fouled and critical thresholds.
+      </p>
     </>
   ),
 };

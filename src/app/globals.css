@@ -499,3 +499,33 @@ button {
   transform: translateX(14px);
   background: var(--color-ink);
 }
+
+/* Signal-chain wires: a dashed line whose dashes flow toward the headphones. */
+.signal-wire {
+  background-image: linear-gradient(to bottom, var(--color-brass) 50%, transparent 50%);
+  background-size: 1px 8px;
+  animation: wire-flow-y 0.9s linear infinite;
+  opacity: 0.75;
+}
+@media (min-width: 640px) {
+  .signal-wire {
+    background-image: linear-gradient(to right, var(--color-brass) 50%, transparent 50%);
+    background-size: 8px 1px;
+    animation-name: wire-flow-x;
+  }
+}
+@keyframes wire-flow-y {
+  to {
+    background-position: 0 8px;
+  }
+}
+@keyframes wire-flow-x {
+  to {
+    background-position: 8px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .signal-wire {
+    animation: none;
+  }
+}

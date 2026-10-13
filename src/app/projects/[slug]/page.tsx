@@ -9,6 +9,7 @@ import { RemotePcb } from "@/components/sims/RemotePcb";
 import { GateLab } from "@/components/sims/GateLab";
 import { ArchDiagram } from "@/components/sims/ArchDiagram";
 import { TowerLab } from "@/components/sims/TowerLab";
+import { PodLab } from "@/components/sims/PodLab";
 import type { ModelKey } from "@/lib/types";
 import { ModelWindow } from "@/components/bench/ModelWindow";
 import { Silk } from "@/components/bench/Silk";
@@ -65,6 +66,7 @@ const LAB: Partial<Record<ModelKey, React.ReactNode>> = {
       </p>
     </>
   ),
+  pod: <PodLab />,
 };
 
 export function generateStaticParams() {

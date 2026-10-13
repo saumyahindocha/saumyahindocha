@@ -68,17 +68,25 @@ export function PodScene({
   active,
   reducedMotion,
   focus = false,
+  explode,
+  onCaseClick,
+  side = false,
 }: {
   active: boolean;
+  /** Start from a three-quarter side view, so the exploded layers separate on screen. */
+  side?: boolean;
   reducedMotion: boolean;
   /** Face the screen and hand all pointer input to it. */
   focus?: boolean;
+  /** 0 assembled … 1 fully exploded, from a slider; clicks then call onCaseClick. */
+  explode?: number;
+  onCaseClick?: () => void;
 }) {
   return (
     <Canvas
       dpr={[1, 1.5]}
       frameloop={active ? "always" : "never"}
-      camera={{ position: [17, 6, 23], fov: 32 }}
+      camera={{ position: side ? [21, 7, 18] : [17, 6, 23], fov: 32 }}
       gl={{ antialias: true, alpha: true }}
       style={{ touchAction: "pan-y" }}
     >
@@ -94,7 +102,12 @@ export function PodScene({
           color="#9fd3b8"
         />
       </Environment>
-      <Pod reducedMotion={reducedMotion} focus={focus} />
+      <Pod
+        reducedMotion={reducedMotion}
+        focus={focus}
+        explode={explode}
+        onCaseClick={onCaseClick}
+      />
       <ContactShadows
         position={[0, -6.2, 0]}
         opacity={0.5}
@@ -107,10 +120,22 @@ export function PodScene({
   );
 }
 
-function Pod({ reducedMotion, focus }: { reducedMotion: boolean; focus: boolean }) {
+function Pod({
+  reducedMotion,
+  focus,
+  explode,
+  onCaseClick,
+}: {
+  reducedMotion: boolean;
+  focus: boolean;
+  explode?: number;
+  onCaseClick?: () => void;
+}) {
   const controls = useRef<OrbitControlsImpl>(null);
   const [explodedState, setExploded] = useState(false);
+  const controlled = explode !== undefined;
   const exploded = explodedState && !focus;
+  const showLabels = controlled ? !focus && explode > 0.35 : exploded;
   const group = useRef<THREE.Group>(null);
   const screen = useRef<THREE.Mesh>(null);
   const engine = useRef<PodEngine | null>(null);
@@ -164,7 +189,7 @@ function Pod({ reducedMotion, focus }: { reducedMotion: boolean; focus: boolean 
       camera.lookAt(controls.current?.target ?? FOCUS_TARGET);
     }
 
-    const target = exploded ? 1 : 0;
+    const target = focus ? 0 : controlled ? explode : exploded ? 1 : 0;
     k.current = reducedMotion ? target : THREE.MathUtils.damp(k.current, target, 6, dt);
     const layers = [
       [bezelRef, "bezel"],
@@ -181,7 +206,9 @@ function Pod({ reducedMotion, focus }: { reducedMotion: boolean; focus: boolean 
 
   const toggle = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
-    if (!focus) setExploded((v) => !v);
+    if (focus) return;
+    if (onCaseClick) onCaseClick();
+    else setExploded((v) => !v);
   };
 
   // Pointer → screen pixels: intersect the pointer ray with the screen's plane (works while
@@ -250,7 +277,7 @@ function Pod({ reducedMotion, focus }: { reducedMotion: boolean; focus: boolean 
               <boxGeometry args={[w, h, 0.15]} />
             </mesh>
           ))}
-          {exploded && <Label at={[-4.0, 3.6, 0]} text="front bezel" left />}
+          {showLabels && <Label at={[-4.0, 3.6, 0]} text="front bezel" left />}
         </group>
 
         {/* Screen module: red PCB, 2.8" panel showing the Poster Now Playing screen */}
@@ -276,7 +303,7 @@ function Pod({ reducedMotion, focus }: { reducedMotion: boolean; focus: boolean 
             <planeGeometry args={[SCREEN_W, SCREEN_H]} />
             <meshBasicMaterial ref={screenMat} map={art} toneMapped={false} />
           </mesh>
-          {exploded && <Label at={[3.2, 0.6, 0]} text={'2.8" 240×320 touch screen'} />}
+          {showLabels && <Label at={[3.2, 0.6, 0]} text={'2.8" 240×320 touch screen'} />}
         </group>
 
         {/* Perfboard with the Pico 2 W in the top strip and the DAC near the bottom */}
@@ -306,7 +333,7 @@ function Pod({ reducedMotion, focus }: { reducedMotion: boolean; focus: boolean 
               <cylinderGeometry args={[0.3, 0.3, 0.6, 16]} />
             </mesh>
           </group>
-          {exploded && (
+          {showLabels && (
             <>
               <Label at={[3.4, 4.3, 0]} text="Pico 2 W" />
               <Label at={[3.4, -4.1, 0]} text="PCM5102 DAC" />
@@ -322,7 +349,7 @@ function Pod({ reducedMotion, focus }: { reducedMotion: boolean; focus: boolean 
             material={lipoMat}
             position={[0, -1.6, 0]}
           />
-          {exploded && <Label at={[-3.8, -1.2, 0]} text="1000 mAh LiPo (planned)" left />}
+          {showLabels && <Label at={[2.6, -1.2, 0]} text="1000 mAh LiPo (planned)" />}
         </group>
 
         {/* Back shell */}
@@ -334,7 +361,7 @@ function Pod({ reducedMotion, focus }: { reducedMotion: boolean; focus: boolean 
             material={shell}
             position={[0, 0, -0.1]}
           />
-          {exploded && <Label at={[-4.0, -5.8, 0]} text="57 × 115 × 24 mm" left />}
+          {showLabels && <Label at={[3.4, -5.6, 0]} text="57 × 115 × 24 mm" />}
         </group>
       </group>
     </>

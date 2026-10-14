@@ -144,12 +144,21 @@ export const NidsScene = forwardRef<
   );
 });
 
-type BotHandle = { push: (dir: number) => void };
+export type BotHandle = { push: (dir: number) => void };
 
-const Bot = forwardRef<
+/** The robot alone, for scenes that bring their own canvas (the home-page bench). */
+export const Bot = forwardRef<
   BotHandle,
-  { reducedMotion: boolean; drive?: RefObject<NidsPose>; onPush?: (dir: number) => void }
->(function Bot({ reducedMotion, drive, onPush: onPushProp }, ref) {
+  {
+    reducedMotion: boolean;
+    drive?: RefObject<NidsPose>;
+    onPush?: (dir: number) => void;
+    /** False when a parent handles hover (the bench), so pointer events reach it. */
+    ownHover?: boolean;
+    /** The CoG callout; off on the bench, where it would crowd the other builds. */
+    labels?: boolean;
+  }
+>(function Bot({ reducedMotion, drive, onPush: onPushProp, ownHover = true, labels = true }, ref) {
   const body = useRef<THREE.Group>(null);
   const wheels = useRef<THREE.Group[]>([]);
   const pushAt = useRef<number | null>(null);
@@ -207,15 +216,23 @@ const Bot = forwardRef<
   return (
     <group
       onClick={onPush}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        setHover(true);
-        document.body.style.cursor = "pointer";
-      }}
-      onPointerOut={() => {
-        setHover(false);
-        document.body.style.cursor = "";
-      }}
+      onPointerOver={
+        ownHover
+          ? (e) => {
+              e.stopPropagation();
+              setHover(true);
+              document.body.style.cursor = "pointer";
+            }
+          : undefined
+      }
+      onPointerOut={
+        ownHover
+          ? () => {
+              setHover(false);
+              document.body.style.cursor = "";
+            }
+          : undefined
+      }
     >
       {/* Wheels and motors stay on the axle; the body pitches about it. */}
       {[-1, 1].map((side) => (
@@ -336,17 +353,19 @@ const Bot = forwardRef<
           <mesh material={brass} position={[0, AXLE_Y + 1.08, 0.55]}>
             <sphereGeometry args={[0.05, 20, 14]} />
           </mesh>
-          <Html
-            position={[0, AXLE_Y + 1.08, 0.55]}
-            center
-            distanceFactor={7}
-            className="pointer-events-none select-none"
-            zIndexRange={[20, 0]}
-          >
-            <span className="ml-12 font-mono text-[10px] whitespace-nowrap text-brass">
-              CoG · 108 mm above axle
-            </span>
-          </Html>
+          {labels && (
+            <Html
+              position={[0, AXLE_Y + 1.08, 0.55]}
+              center
+              distanceFactor={7}
+              className="pointer-events-none select-none"
+              zIndexRange={[20, 0]}
+            >
+              <span className="ml-12 font-mono text-[10px] whitespace-nowrap text-brass">
+                CoG · 108 mm above axle
+              </span>
+            </Html>
+          )}
         </group>
       </group>
 

@@ -28,8 +28,12 @@ const plate = () =>
 
 const asphalt = new THREE.MeshStandardMaterial({ color: "#2c302e", roughness: 0.95 });
 const paint = new THREE.MeshStandardMaterial({ color: "#e9e4d4", roughness: 0.8 });
-const pole = new THREE.MeshStandardMaterial({ color: "#9aa39e", metalness: 0.6, roughness: 0.4 });
-const camBody = new THREE.MeshStandardMaterial({ color: "#e8e6df", roughness: 0.4 });
+export const pole = new THREE.MeshStandardMaterial({
+  color: "#9aa39e",
+  metalness: 0.6,
+  roughness: 0.4,
+});
+export const camBody = new THREE.MeshStandardMaterial({ color: "#e8e6df", roughness: 0.4 });
 const tyre = new THREE.MeshStandardMaterial({ color: "#141615", roughness: 0.8 });
 const seat = new THREE.MeshStandardMaterial({ color: "#1b1d1c", roughness: 0.6 });
 
@@ -211,7 +215,7 @@ function Gate() {
   );
 }
 
-function Scooter({ color }: { color: string }) {
+export function Scooter({ color }: { color: string }) {
   return (
     <group>
       {[-0.55, 0.55].map((x) => (

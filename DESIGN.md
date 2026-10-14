@@ -143,13 +143,15 @@ seasoning. If a section has more than one of them, remove one.
 ### Grid and container
 
 - Container 1152 px, gutters 20 px on mobile and 32 px on desktop. Sections are 96 px apart.
-- Sections vary their layout family: split hero, 2×2 hairline grid, staggered tile bench, labelled
-  list (heading column + content), dimensioned timeline, plain contact list.
+- Home: a split hero with the 3D bench bleeding off the right edge, four pinned project chapters
+  (model and text swap sides each time, a huge outline wordmark drifts behind), a sideways failure
+  reel, then a short About (heading column + facts) and a plain contact list. No timelines.
 
 ### Responsive
 
 - Works from 360 px. Every multi-column layout declares its single-column fallback.
-- The staggered tile offset (`md:mt-16` on the right column) only applies at 768 px and up.
+- Chapters pin only at 768 px and up; on phones they stack (model, then text) and reveal as they
+  scroll in. The failure reel pans sideways on desktop and is a swipeable row on phones.
 - The lamp light and tile tilt hover are disabled for touch and coarse pointers.
 
 ## Elevation and depth
@@ -202,9 +204,14 @@ A CAD dimension with extension ticks, arrowheads and a centred mono label. Used 
 ### 3D models
 
 Built procedurally in React Three Fiber from real dimensions in the repos, on a transparent
-canvas so they sit on the mat with a contact shadow. Each loads lazily (after first paint for the
-hero, on scroll for tiles), shows its line drawing until ready, and stops rendering off-screen.
+canvas so they sit on the mat with a contact shadow. Each loads lazily (after the first
+interaction), shows a still or its line drawing until ready, and stops rendering off-screen.
 Mouse users can orbit; on touch, dragging scrolls the page and a tap acts on the model.
+
+The hero bench holds all four builds with silkscreen labels. Hovering lifts a build and turns its
+label copper; clicking scrolls to its chapter. As the hero scrolls away the camera rises to a
+top-down view. In the chapters, scroll drives the model: NIDS gets pushed as its chapter crosses
+the middle and the Pod case comes apart and back together.
 
 ### Desk lamp
 
@@ -217,8 +224,10 @@ that follows a mouse pointer. Off on touch devices and with `prefers-reduced-mot
 - 150–300 ms with the bench ease. Animate only `transform` and `opacity`.
 - Content below the fold fades and rises 32 px once as it enters (about 1 s, glide ease). Content
   already on screen at load never waits. Nothing loops in the page chrome.
-- No parallax and no autoplaying sound. Mouse-wheel scrolling eases on desktop (Lenis, at my request);
-  touch scrolling is native. With reduced motion, reveals are instant,
+- Scroll motion is allowed where it explains something (a build being pushed, a case coming
+  apart, a chapter's story arriving step by step). No decorative parallax, no autoplaying sound.
+  Copper numbers settle into place once as they appear. Mouse-wheel scrolling eases on desktop
+  (Lenis); touch scrolling is native. With reduced motion, everything shows at once, nothing pins,
   tiles do not move, sims start paused and the lamp is off.
 
 ## Do's and Don'ts

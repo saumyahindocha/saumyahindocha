@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import type { ModelKey, TileMedia } from "@/lib/types";
 import { useEngaged } from "@/lib/engaged";
 import type { NidsHandle } from "@/three/NidsScene";
@@ -38,7 +38,21 @@ const HINT_POD_FOCUS = "Pod's own screen code";
  * A tile's picture window: a 3D model by default, with a switch to the real build photo.
  * Shows the photo (or drawing) until the model loads, and pauses the model off-screen.
  */
-export function ModelWindow({ model, media }: { model: ModelKey; media: TileMedia }) {
+export function ModelWindow({
+  model,
+  media,
+  explodeRef,
+  pushSignal = 0,
+  sizes = "(min-width: 768px) 560px, 92vw",
+}: {
+  model: ModelKey;
+  media: TileMedia;
+  /** Pod only: scroll-driven explode amount, read every frame. */
+  explodeRef?: RefObject<number>;
+  /** NIDS only: each change pushes the robot once, alternating direction. */
+  pushSignal?: number;
+  sizes?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const nids = useRef<NidsHandle>(null);
   const [seen, setSeen] = useState(false);
@@ -81,6 +95,13 @@ export function ModelWindow({ model, media }: { model: ModelKey; media: TileMedi
     return () => window.clearTimeout(t);
   }, [model, active, env.reduced]);
 
+  // Scroll-driven pushes from a home-page chapter.
+  useEffect(() => {
+    if (model !== "nids" || pushSignal === 0 || env.reduced) return;
+    nids.current?.push(pushSignal % 2 ? 1 : -1);
+    pushed.current = true;
+  }, [model, pushSignal, env.reduced]);
+
   const engaged = useEngaged();
   const show3d = seen && engaged && env.gl && view === "3d";
   const hasPhoto = media.kind === "photo";
@@ -97,7 +118,7 @@ export function ModelWindow({ model, media }: { model: ModelKey; media: TileMedi
             alt={media.alt}
             width={media.width}
             height={media.height}
-            sizes="(min-width: 768px) 560px, 92vw"
+            sizes={sizes}
             className="size-full object-cover"
           />
         ) : (
@@ -120,7 +141,13 @@ export function ModelWindow({ model, media }: { model: ModelKey; media: TileMedi
             />
           )}
           {model === "pod" && (
-            <PodScene active={active} reducedMotion={env.reduced} focus={podFocus} />
+            <PodScene
+              active={active}
+              reducedMotion={env.reduced}
+              focus={podFocus}
+              explodeRef={explodeRef}
+              side={!!explodeRef}
+            />
           )}
           {model === "gate" && <GateScene active={active} reducedMotion={env.reduced} />}
           {model === "tower" && <TowerScene active={active} reducedMotion={env.reduced} />}

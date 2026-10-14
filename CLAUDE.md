@@ -44,11 +44,16 @@ from Saumya directly. Nothing is rounded up, invented or implied.
 - Bricolage Grotesque for headings, Manrope for body, JetBrains Mono for every number, unit, code
   and label.
 - Tiles rest on the mat with soft shadows and lift slightly on hover.
-- No project is the centrepiece: the four home tiles are near equal (7/5, then 6/6 columns), each
-  with its own model. Keep it that way when adding projects.
-- Motion: transform and opacity only, below-the-fold reveals only, eased desktop wheel scroll
-  (Lenis), a white loupe that follows the mouse and a touch glow on phones. Everything respects
-  `prefers-reduced-motion`.
+- The home page is a 3D bench hero (all four builds on one mat, `src/three/BenchScene.tsx`),
+  then one scroll chapter per project (`src/components/home/Chapter.tsx`), a failure reel, a short
+  About and contact. Chapter copy and the reel live in `src/content/home.ts`, sourced from the MDX.
+- No project is the centrepiece: every project gets an equal chapter, in `code` order, each with
+  its own model. Keep it that way when adding projects (add it to the bench too).
+- Motion: transform and opacity only, eased desktop wheel scroll (Lenis), a white loupe that
+  follows the mouse and a touch glow on phones. Scroll-driven effects read `--p` from
+  `useScrollProgress` (`src/lib/scroll.ts`, no React state per frame); on desktop chapters pin and
+  reveal step by step, on phones they reveal as they scroll in. Everything respects
+  `prefers-reduced-motion` (all steps shown, nothing pinned).
 - Focus rings: brass, 2 px, visible on every control.
 
 ## Performance budget (check before merging anything visual)
@@ -60,6 +65,9 @@ page before 3D. To stay there:
   `src/lib/engaged.ts`), and only when on screen. Until then the tile shows its photo or drawing.
 - Never hide content that is on screen at load (`Reveal` only hides what is below the fold).
 - Fonts use `display: optional`. Images are WebP with width and height set.
+- The hero shows `public/media/bench-poster.webp` until the scene loads (on phones only after the
+  first touch, so the headline is the LCP). After changing `BenchScene`, re-render it:
+  `npm run build && npx serve@14 out -l 4173`, then `node tools/bench-poster/render.mjs http://localhost:4173/`.
 
 ## Content schema
 

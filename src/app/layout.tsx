@@ -8,11 +8,11 @@ import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin"], display: "optional" });
-// Headings only. The optical-size axis gives big titles the tighter display cut.
+// Headings only, so just the two weights headings use (keeps the font file small).
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
   subsets: ["latin"],
-  axes: ["opsz"],
+  weight: ["600", "700"],
   display: "optional",
 });
 const jetbrains = JetBrains_Mono({

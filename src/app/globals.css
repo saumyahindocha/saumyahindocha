@@ -530,3 +530,77 @@ button {
     animation: none;
   }
 }
+
+/*
+  Home-page chapters. --p is the chapter's scroll progress (src/lib/scroll.ts).
+  Text steps fade up as they are reached; the model settles in and the outline
+  wordmark behind it drifts the other way, so the two read as layers.
+*/
+.chapter-step {
+  transition:
+    opacity 700ms var(--ease-glide),
+    transform 900ms var(--ease-glide);
+}
+.chapter-step[data-on="false"] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+}
+.chapter-model {
+  transform: translate3d(0, calc((0.35 - min(var(--p), 0.35)) * 18vh), 0)
+    scale(calc(0.92 + min(var(--p), 0.35) * 0.2286));
+  will-change: transform;
+}
+.chapter-mark {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(242 239 230 / 0.16);
+  transform: translate3d(calc((0.5 - var(--p)) * 18vw), 0, 0);
+  will-change: transform;
+}
+.chapter-mark[data-flip="true"] {
+  transform: translate3d(calc((var(--p) - 0.5) * 18vw), 0, 0);
+}
+
+/* Failure reel: the track slides left as the pinned section scrolls. */
+.reel-track {
+  transform: translate3d(calc(var(--p) * var(--travel, 0px) * -1), 0, 0);
+  will-change: transform;
+}
+
+/* Hero: the headline's last word gets a copper stroke drawn under it once on load. */
+.hero-stroke path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: plot 1100ms var(--ease-glide) 500ms forwards;
+}
+/* The hero copy eases up and fades a little as the bench takes over the screen. */
+.hero-copy {
+  transform: translate3d(0, calc(var(--p, 0) * -12vh), 0);
+  opacity: calc(1 - var(--p, 0) * 1.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter-step[data-on="false"] {
+    opacity: 1;
+    transform: none;
+  }
+  .chapter-model,
+  .chapter-mark,
+  .hero-copy {
+    transform: none;
+  }
+  .hero-stroke path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Off-screen chapters skip style and layout until they come near, so the first paint is cheap. */
+.chapter {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1400px;
+}
+@media (min-width: 768px) {
+  .chapter {
+    contain-intrinsic-size: auto 260vh;
+  }
+}

@@ -23,7 +23,7 @@ const NidsScene = dynamic(() => import("@/three/NidsScene").then((m) => m.NidsSc
 });
 
 const INK = "#f2efe6";
-const BRASS = "#ddb06f";
+const BRASS = "#eaa682";
 const SAGE = "#a9bda4";
 const TEAL = "#7fc8c0";
 const RED = "#e0775f";

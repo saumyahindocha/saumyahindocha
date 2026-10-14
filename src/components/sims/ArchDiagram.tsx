@@ -217,7 +217,7 @@ export function ArchDiagram() {
                   setSel(n.id);
                 }
               }}
-              className="cursor-pointer outline-none [&:focus-visible>rect]:stroke-[#ddb06f]"
+              className="cursor-pointer outline-none [&:focus-visible>rect]:stroke-[#eaa682]"
             >
               <rect
                 x={n.x}
@@ -225,8 +225,8 @@ export function ArchDiagram() {
                 width={n.w}
                 height={H}
                 rx="4"
-                fill={sel === n.id ? "#ddb06f" : "#10291f"}
-                stroke={sel === n.id ? "#ddb06f" : "rgba(242,239,230,0.3)"}
+                fill={sel === n.id ? "#eaa682" : "#10291f"}
+                stroke={sel === n.id ? "#eaa682" : "rgba(242,239,230,0.3)"}
                 strokeWidth="1.5"
               />
               <text

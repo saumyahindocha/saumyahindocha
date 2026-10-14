@@ -97,7 +97,7 @@ function makeDrops() {
   }));
 }
 
-function Tower({ drive }: { drive?: RefObject<TowerDrive> }) {
+export function Tower({ drive }: { drive?: RefObject<TowerDrive> }) {
   const fan = useRef<THREE.Group>(null);
   const drops = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);

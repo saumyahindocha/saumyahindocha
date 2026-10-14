@@ -12,7 +12,7 @@ import { LabButton, useLabEnv, useOnScreen } from "./controls";
 
 const INK = "#f2efe6";
 const SAGE = "#a9bda4";
-const BRASS = "#ddb06f";
+const BRASS = "#eaa682";
 const LINE = "rgba(242,239,230,0.16)";
 const RED = "#e0775f";
 const TEAL = "#7fc8c0";
@@ -409,7 +409,7 @@ export function GateLab() {
                   style={{ height: `${(h.in / maxH) * 100}%` }}
                 />
                 <div
-                  className="flex-1 rounded-t-[1px] bg-[#ddb06f]/55"
+                  className="flex-1 rounded-t-[1px] bg-[#eaa682]/55"
                   style={{ height: `${(h.out / maxH) * 100}%` }}
                 />
               </div>

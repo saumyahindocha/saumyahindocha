@@ -28,8 +28,12 @@ const plate = () =>
 
 const asphalt = new THREE.MeshStandardMaterial({ color: "#2c302e", roughness: 0.95 });
 const paint = new THREE.MeshStandardMaterial({ color: "#e9e4d4", roughness: 0.8 });
-const pole = new THREE.MeshStandardMaterial({ color: "#9aa39e", metalness: 0.6, roughness: 0.4 });
-const camBody = new THREE.MeshStandardMaterial({ color: "#e8e6df", roughness: 0.4 });
+export const pole = new THREE.MeshStandardMaterial({
+  color: "#9aa39e",
+  metalness: 0.6,
+  roughness: 0.4,
+});
+export const camBody = new THREE.MeshStandardMaterial({ color: "#e8e6df", roughness: 0.4 });
 const tyre = new THREE.MeshStandardMaterial({ color: "#141615", roughness: 0.8 });
 const seat = new THREE.MeshStandardMaterial({ color: "#1b1d1c", roughness: 0.6 });
 
@@ -133,8 +137,8 @@ function Gate() {
           <planeGeometry args={[0.08, 1.5]} />
           <meshStandardMaterial
             ref={dir === "in" ? lineIn : lineOut}
-            color="#ddb06f"
-            emissive="#ddb06f"
+            color="#eaa682"
+            emissive="#eaa682"
             emissiveIntensity={0.3}
           />
         </mesh>
@@ -186,7 +190,7 @@ function Gate() {
             visible={false}
           >
             <boxGeometry args={[1.85, 1.15, 0.8]} />
-            <meshBasicMaterial color="#ddb06f" wireframe transparent opacity={0.85} />
+            <meshBasicMaterial color="#eaa682" wireframe transparent opacity={0.85} />
           </mesh>
         </group>
       ))}
@@ -211,7 +215,7 @@ function Gate() {
   );
 }
 
-function Scooter({ color }: { color: string }) {
+export function Scooter({ color }: { color: string }) {
   return (
     <group>
       {[-0.55, 0.55].map((x) => (

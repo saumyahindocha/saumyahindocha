@@ -10,7 +10,7 @@ import {
   RoundedBox,
   useTexture,
 } from "@react-three/drei";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { PodEngine, POD_H, POD_W } from "@/pod/podEngine";
 import * as THREE from "three";
@@ -69,9 +69,11 @@ export function PodScene({
   reducedMotion,
   focus = false,
   explode,
+  explodeRef,
   onCaseClick,
   side = false,
 }: {
+  explodeRef?: RefObject<number>;
   active: boolean;
   /** Start from a three-quarter side view, so the exploded layers separate on screen. */
   side?: boolean;
@@ -106,6 +108,7 @@ export function PodScene({
         reducedMotion={reducedMotion}
         focus={focus}
         explode={explode}
+        explodeRef={explodeRef}
         onCaseClick={onCaseClick}
       />
       <ContactShadows
@@ -120,22 +123,33 @@ export function PodScene({
   );
 }
 
-function Pod({
+/** The Pod alone. `bare` leaves out its orbit controls, for scenes that bring their own. */
+export function Pod({
   reducedMotion,
   focus,
   explode,
+  explodeRef,
   onCaseClick,
+  bare = false,
 }: {
   reducedMotion: boolean;
   focus: boolean;
   explode?: number;
+  /** Like `explode`, but read every frame (scroll-driven), so it never re-renders. */
+  explodeRef?: RefObject<number>;
   onCaseClick?: () => void;
+  bare?: boolean;
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const [explodedState, setExploded] = useState(false);
   const controlled = explode !== undefined;
   const exploded = explodedState && !focus;
-  const showLabels = controlled ? !focus && explode > 0.35 : exploded;
+  const [refLabels, setRefLabels] = useState(false);
+  const showLabels = explodeRef
+    ? !focus && refLabels
+    : controlled
+      ? !focus && explode > 0.35
+      : exploded;
   const group = useRef<THREE.Group>(null);
   const screen = useRef<THREE.Mesh>(null);
   const engine = useRef<PodEngine | null>(null);
@@ -189,7 +203,16 @@ function Pod({
       camera.lookAt(controls.current?.target ?? FOCUS_TARGET);
     }
 
-    const target = focus ? 0 : controlled ? explode : exploded ? 1 : 0;
+    const target = focus
+      ? 0
+      : explodeRef
+        ? explodeRef.current
+        : controlled
+          ? explode
+          : exploded
+            ? 1
+            : 0;
+    if (explodeRef && !focus && target > 0.35 !== refLabels) setRefLabels(target > 0.35);
     k.current = reducedMotion ? target : THREE.MathUtils.damp(k.current, target, 6, dt);
     const layers = [
       [bezelRef, "bezel"],
@@ -253,16 +276,18 @@ function Pod({
 
   return (
     <>
-      <OrbitControls
-        ref={controls}
-        target={[0, 0, 0.5]}
-        enablePan={false}
-        enableZoom={false}
-        enabled={!focus}
-        autoRotate={!reducedMotion && !focus}
-        autoRotateSpeed={0.7}
-        enableDamping
-      />
+      {!bare && (
+        <OrbitControls
+          ref={controls}
+          target={[0, 0, 0.5]}
+          enablePan={false}
+          enableZoom={false}
+          enabled={!focus}
+          autoRotate={!reducedMotion && !focus}
+          autoRotateSpeed={0.7}
+          enableDamping
+        />
+      )}
       <group ref={group} onClick={toggle} rotation={[0, -0.35, 0]}>
         {/* Front bezel: a frame around the screen */}
         <group ref={bezelRef}>

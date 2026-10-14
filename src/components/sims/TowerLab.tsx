@@ -21,7 +21,7 @@ const TowerScene = dynamic(() => import("@/three/TowerScene").then((m) => m.Towe
   ssr: false,
 });
 
-const BRASS = "#ddb06f";
+const BRASS = "#eaa682";
 const TEAL = "#7fc8c0";
 
 const STEP_MS = 400; // one simulator step per 0.4 s here (the backend samples every 15 s)

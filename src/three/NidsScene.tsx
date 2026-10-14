@@ -52,7 +52,7 @@ const pcbRed = new THREE.MeshStandardMaterial({ color: "#b3261e", roughness: 0.5
 const pcbBlue = new THREE.MeshStandardMaterial({ color: "#1f4fa3", roughness: 0.5 });
 const black = new THREE.MeshStandardMaterial({ color: "#1a1a1a", roughness: 0.4, metalness: 0.3 });
 const lipo = new THREE.MeshStandardMaterial({ color: "#e0782f", roughness: 0.6 });
-const brass = new THREE.MeshStandardMaterial({ color: "#ddb06f", metalness: 0.7, roughness: 0.3 });
+const brass = new THREE.MeshStandardMaterial({ color: "#eaa682", metalness: 0.7, roughness: 0.3 });
 
 export type NidsHandle = { push: (dir?: number) => void };
 /** Pose from the live sim: pitch θ (rad, positive leans back toward −z) and wheel travel p (m). */

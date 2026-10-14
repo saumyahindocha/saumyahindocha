@@ -7,24 +7,25 @@
   most: headline numbers, emphasis, key links. Status colours appear only inside sims.
 */
 @theme {
-  --color-mat: #1d4b39;
-  --color-mat-deep: #163d2e;
-  --color-mat-shade: #10291f;
-  --color-surface: #133528;
-  --color-surface-raised: #17402f;
-  --color-ink: #f2efe6;
-  --color-sage: #a9bda4;
-  --color-sage-dim: #7f977b;
-  --color-line: rgb(242 239 230 / 0.14);
-  --color-line-strong: rgb(242 239 230 / 0.28);
-  --color-brass: #ddb06f;
-  --color-brass-deep: #b8874a;
-  /* Copper, like bare PCB traces: complements the green, 5.4:1 on mat, 7.3:1 on surface. */
+  /* Night bench: the same green mat, under a desk lamp after dark. */
+  --color-mat: #0f1a15;
+  --color-mat-deep: #0c1511;
+  --color-mat-shade: #08100c;
+  --color-surface: #14211b;
+  --color-surface-raised: #1a2a23;
+  --color-ink: #eeeae1;
+  --color-sage: #a6b3aa;
+  --color-sage-dim: #7f8f85;
+  --color-line: rgb(238 234 225 / 0.1);
+  --color-line-strong: rgb(238 234 225 / 0.22);
+  --color-brass: #eaa682;
+  --color-brass-deep: #c98462;
+  /* Copper, like bare PCB traces: the text that matters most. */
   --color-copper: #f4b08c;
 
-  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-bricolage), var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", monospace;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
 
   /* Type scale (1.25 ratio, rem) */
   --text-silk: 0.6875rem;
@@ -68,21 +69,23 @@ body {
   font-family: var(--font-sans);
   background-color: var(--color-mat);
   background-image:
-    linear-gradient(to right, rgb(232 240 226 / 0.11) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(232 240 226 / 0.11) 1px, transparent 1px),
+    radial-gradient(90rem 50rem at 70% -10rem, rgb(46 92 72 / 0.38), transparent 70%),
     linear-gradient(to right, rgb(232 240 226 / 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(232 240 226 / 0.045) 1px, transparent 1px), url("/mat-noise.svg");
+    linear-gradient(to bottom, rgb(232 240 226 / 0.045) 1px, transparent 1px),
+    linear-gradient(to right, rgb(232 240 226 / 0.018) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(232 240 226 / 0.018) 1px, transparent 1px), url("/mat-noise.svg");
   background-size:
+    100% 100%,
     var(--major) var(--major),
     var(--major) var(--major),
     var(--unit) var(--unit),
     var(--unit) var(--unit),
     240px 240px;
-  font-feature-settings: "ss01", "cv11";
+  background-repeat: no-repeat, repeat, repeat, repeat, repeat, repeat;
 }
 
 ::selection {
-  background: rgb(221 176 111 / 0.35);
+  background: rgb(244 176 140 / 0.32);
   color: var(--color-ink);
 }
 
@@ -90,14 +93,13 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-optical-sizing: auto;
   text-wrap: balance;
 }
 
 a,
 button {
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgb(221 176 111 / 0.18);
+  -webkit-tap-highlight-color: rgb(244 176 140 / 0.18);
 }
 
 /* The tile title link stretches over the whole tile; draw its focus ring on the tile edge. */
@@ -113,44 +115,6 @@ button {
   outline: 2px solid var(--color-brass);
   outline-offset: 3px;
   border-radius: 2px;
-}
-
-/* Ruler ticks along the top and left edges of the mat. */
-.mat-edges::before,
-.mat-edges::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  background-repeat: repeat-x;
-}
-.mat-edges::before {
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 14px;
-  background-image:
-    linear-gradient(to right, rgb(242 239 230 / 0.42) 1px, transparent 1px),
-    linear-gradient(to right, rgb(242 239 230 / 0.3) 1px, transparent 1px),
-    linear-gradient(to right, rgb(242 239 230 / 0.2) 1px, transparent 1px);
-  background-size:
-    var(--major) 14px,
-    calc(var(--major) / 2) 9px,
-    var(--unit) 5px;
-}
-.mat-edges::after {
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 14px;
-  background-repeat: repeat-y;
-  background-image:
-    linear-gradient(to bottom, rgb(242 239 230 / 0.42) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(242 239 230 / 0.3) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(242 239 230 / 0.2) 1px, transparent 1px);
-  background-size:
-    14px var(--major),
-    9px calc(var(--major) / 2),
-    5px var(--unit);
 }
 
 /* Lamp falloff: the edges of the view sit slightly outside the light. */
@@ -531,76 +495,44 @@ button {
   }
 }
 
-/*
-  Home-page chapters. --p is the chapter's scroll progress (src/lib/scroll.ts).
-  Text steps fade up as they are reached; the model settles in and the outline
-  wordmark behind it drifts the other way, so the two read as layers.
-*/
-.chapter-step {
-  transition:
-    opacity 700ms var(--ease-glide),
-    transform 900ms var(--ease-glide);
+/* Hero turntable: the copper bar under the current build fills while it is on show. */
+.stage-progress {
+  transform: scaleX(0);
+  animation: stage-fill 7s linear forwards;
 }
-.chapter-step[data-on="false"] {
-  opacity: 0;
-  transform: translate3d(0, 28px, 0);
+@keyframes stage-fill {
+  to {
+    transform: scaleX(1);
+  }
 }
-.chapter-model {
-  transform: translate3d(0, calc((0.35 - min(var(--p), 0.35)) * 18vh), 0)
-    scale(calc(0.92 + min(var(--p), 0.35) * 0.2286));
-  will-change: transform;
+
+/* About: words brighten as the paragraph scrolls up (--p from src/lib/scroll.ts). */
+.lit span {
+  opacity: clamp(0.18, calc((var(--p, 1) * 2.4 * (var(--n) + 6) - var(--i)) / 6), 1);
+  transition: opacity 180ms linear;
 }
-.chapter-mark {
-  color: transparent;
-  -webkit-text-stroke: 1px rgb(242 239 230 / 0.16);
-  transform: translate3d(calc((0.5 - var(--p)) * 18vw), 0, 0);
-  will-change: transform;
-}
-.chapter-mark[data-flip="true"] {
-  transform: translate3d(calc((var(--p) - 0.5) * 18vw), 0, 0);
+
+/* Work stack: the card underneath settles back as the next one slides over it. */
+.work-card-inner {
+  transform: scale(calc(1 - var(--k, 0) * 0.05));
+  transform-origin: 50% 0;
 }
 
 /* Failure reel: the track slides left as the pinned section scrolls. */
 .reel-track {
-  transform: translate3d(calc(var(--p) * var(--travel, 0px) * -1), 0, 0);
+  transform: translate3d(calc(var(--p, 0) * var(--travel, 0px) * -1), 0, 0);
   will-change: transform;
 }
 
-/* Hero: the headline's last word gets a copper stroke drawn under it once on load. */
-.hero-stroke path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: plot 1100ms var(--ease-glide) 500ms forwards;
-}
-/* The hero copy eases up and fades a little as the bench takes over the screen. */
-.hero-copy {
-  transform: translate3d(0, calc(var(--p, 0) * -12vh), 0);
-  opacity: calc(1 - var(--p, 0) * 1.4);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .chapter-step[data-on="false"] {
-    opacity: 1;
-    transform: none;
-  }
-  .chapter-model,
-  .chapter-mark,
-  .hero-copy {
-    transform: none;
-  }
-  .hero-stroke path {
+  .stage-progress {
     animation: none;
-    stroke-dashoffset: 0;
+    transform: scaleX(1);
   }
-}
-
-/* Off-screen chapters skip style and layout until they come near, so the first paint is cheap. */
-.chapter {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 1400px;
-}
-@media (min-width: 768px) {
-  .chapter {
-    contain-intrinsic-size: auto 260vh;
+  .lit span {
+    opacity: 1;
+  }
+  .work-card-inner {
+    transform: none;
   }
 }

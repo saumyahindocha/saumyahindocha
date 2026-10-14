@@ -223,7 +223,7 @@ function Leader({
   const elbow = x2 + 84;
   return (
     <g>
-      <circle cx={x1} cy={y1} r="1.8" fill="#ddb06f" />
+      <circle cx={x1} cy={y1} r="1.8" fill="#eaa682" />
       <polyline
         points={`${x1},${y1} ${elbow},${y2} ${x2},${y2}`}
         fill="none"

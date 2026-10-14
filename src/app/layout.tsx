@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, JetBrains_Mono, Manrope } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { BenchFX } from "@/components/bench/BenchFX";
 import { Nav } from "@/components/bench/Nav";
 import { Footer } from "@/components/bench/Footer";
@@ -7,16 +7,9 @@ import { SmoothScroll } from "@/components/bench/SmoothScroll";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin"], display: "optional" });
-// Headings only, so just the two weights headings use (keeps the font file small).
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
-  subsets: ["latin"],
-  weight: ["600", "700"],
-  display: "optional",
-});
-const jetbrains = JetBrains_Mono({
-  variable: "--font-jetbrains",
+const geist = Geist({ variable: "--font-geist", subsets: ["latin"], display: "optional" });
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "optional",
 });
@@ -32,12 +25,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1d4b39",
+  themeColor: "#0f1a15",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${manrope.variable} ${bricolage.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
       <body className="antialiased">
         <a
           href="#main"
@@ -45,7 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         >
           Skip to content
         </a>
-        <div className="mat-edges relative min-h-dvh overflow-x-clip">
+        <div className="relative min-h-dvh overflow-x-clip">
           <BenchFX />
           <SmoothScroll />
           <Nav />

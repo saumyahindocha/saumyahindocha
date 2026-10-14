@@ -1,54 +1,22 @@
 // Home-page copy. Every fact comes from a project page (content/projects/*.mdx) or from Saumya.
 
-/** One line per project to open its chapter, plus the failure it is told through. */
-export const chapters: Record<
-  string,
-  {
-    hook: string;
-    wordmark: string;
-    tryIt: string;
-    broke: { when: string; symptom: string; fix: string };
-  }
-> = {
+/** Per project: the line that opens its card, and a short name for the hero turntable. */
+export const hooks: Record<string, { hook: string; short: string }> = {
   "nids-self-balancing-robot": {
     hook: "It wants to fall over in 0.12 seconds. It balanced for 50.",
-    wordmark: "NIDS",
-    tryIt: "Click the robot to push it.",
-    broke: {
-      when: "Jun 2026",
-      symptom: "Pressing the mode button froze the whole balance loop.",
-      fix: "The debounce used delay(300). The rewrite debounces without blocking.",
-    },
+    short: "NIDS robot",
   },
   "station-parking": {
     hook: "Built so 3,000 bikes a day never stop for a ticket.",
-    wordmark: "ANPR",
-    tryIt: "Each plate is read as it crosses the line.",
-    broke: {
-      when: "27 Sep 2026",
-      symptom: "The install rehearsal ran at 392% CPU, with events 4.5 s late.",
-      fix: "Reading plates on motion or every 5th frame cut it to about 160% and 0.8 s.",
-    },
+    short: "Parking gate",
   },
   "ss-filters-energy-audit": {
     hook: "Dirty cooling water has a price. This puts it in rupees.",
-    wordmark: "TOWER",
-    tryIt: "Its project page has a live audit you can tune.",
-    broke: {
-      when: "Jul 2026",
-      symptom: "The first login only worked inside the platform it was built on.",
-      fix: "I took the sign-in out of the frontend, so the dashboard opens without it.",
-    },
+    short: "Cooling tower",
   },
   pod: {
     hook: "A music player I soldered together in one night.",
-    wordmark: "POD",
-    tryIt: "Use the screen: it runs Pod’s own display code.",
-    broke: {
-      when: "10 Oct 2026",
-      symptom: "Every touch reading came back as 0 or 8191.",
-      fix: "An open solder link from GP4 to T_DO. Resoldered, and the firmware now rejects readings from an open line.",
-    },
+    short: "Pod",
   },
 };
 

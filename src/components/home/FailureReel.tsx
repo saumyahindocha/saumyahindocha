@@ -74,7 +74,7 @@ export function FailureReel({ items }: { items: Failure[] }) {
           {items.map((f) => (
             <li
               key={f.symptom}
-              className="tile relative flex w-[78vw] shrink-0 snap-start flex-col rounded-md border border-line bg-surface p-6 sm:w-[22rem]"
+              className="relative flex w-[78vw] shrink-0 snap-start flex-col rounded-[14px] border border-line bg-surface p-6 sm:w-[22rem]"
             >
               <p className="font-mono text-xs text-copper tabular-nums">{f.when}</p>
               <p className="mt-1 font-mono text-[0.6875rem] tracking-[0.12em] text-sage uppercase">

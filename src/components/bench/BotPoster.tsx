@@ -20,7 +20,7 @@ const COG = AXLE + 108;
 
 const INK = "#f2efe6";
 const SAGE = "#a9bda4";
-const BRASS = "#ddb06f";
+const BRASS = "#eaa682";
 
 export function BotPoster({ className = "" }: { className?: string }) {
   const [pushes, setPushes] = useState(0);

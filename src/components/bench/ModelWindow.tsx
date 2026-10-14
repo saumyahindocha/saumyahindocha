@@ -167,7 +167,7 @@ export function ModelWindow({
             <button
               type="button"
               onClick={() => nids.current?.push(1)}
-              className="rounded-[3px] border border-line-strong bg-mat-shade/75 px-2 py-0.5 font-mono text-[0.625rem] text-ink backdrop-blur-sm hover:border-brass"
+              className="rounded-[6px] border border-line-strong bg-mat-shade/75 px-2 py-0.5 font-mono text-[0.625rem] text-ink backdrop-blur-sm hover:border-brass"
             >
               Push
             </button>
@@ -177,7 +177,7 @@ export function ModelWindow({
               type="button"
               aria-pressed={podFocus}
               onClick={() => setPodFocus((f) => !f)}
-              className={`rounded-[3px] border px-2 py-0.5 font-mono text-[0.625rem] backdrop-blur-sm transition-colors ${podFocus ? "border-brass bg-brass text-mat-shade" : "border-line-strong bg-mat-shade/75 text-ink hover:border-brass"}`}
+              className={`rounded-[6px] border px-2 py-0.5 font-mono text-[0.625rem] backdrop-blur-sm transition-colors ${podFocus ? "border-brass bg-brass text-mat-shade" : "border-line-strong bg-mat-shade/75 text-ink hover:border-brass"}`}
             >
               {podFocus ? "Done" : "Use screen"}
             </button>
@@ -186,7 +186,7 @@ export function ModelWindow({
             <div
               role="group"
               aria-label="View"
-              className="flex overflow-hidden rounded-[3px] border border-line-strong bg-mat-shade/75 backdrop-blur-sm"
+              className="flex overflow-hidden rounded-[6px] border border-line-strong bg-mat-shade/75 backdrop-blur-sm"
             >
               {(["3d", "photo"] as const).map((v) => (
                 <button

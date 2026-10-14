@@ -16,10 +16,10 @@ export function Monogram({ size = 36, className = "" }: { size?: number; classNa
         height="34"
         rx="5"
         fill="none"
-        stroke="#ddb06f"
+        stroke="#eaa682"
         strokeWidth="1.5"
       />
-      <circle cx="6" cy="6" r="1.4" fill="#ddb06f" />
+      <circle cx="6" cy="6" r="1.4" fill="#eaa682" />
       <text
         x="18"
         y="23.5"

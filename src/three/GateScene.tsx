@@ -137,8 +137,8 @@ function Gate() {
           <planeGeometry args={[0.08, 1.5]} />
           <meshStandardMaterial
             ref={dir === "in" ? lineIn : lineOut}
-            color="#ddb06f"
-            emissive="#ddb06f"
+            color="#eaa682"
+            emissive="#eaa682"
             emissiveIntensity={0.3}
           />
         </mesh>
@@ -190,7 +190,7 @@ function Gate() {
             visible={false}
           >
             <boxGeometry args={[1.85, 1.15, 0.8]} />
-            <meshBasicMaterial color="#ddb06f" wireframe transparent opacity={0.85} />
+            <meshBasicMaterial color="#eaa682" wireframe transparent opacity={0.85} />
           </mesh>
         </group>
       ))}

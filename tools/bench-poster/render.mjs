@@ -1,6 +1,6 @@
-// Renders the still that the home-page hero shows before its 3D bench loads.
+// Renders the still that the home-page hero shows before its 3D turntable loads.
 // Usage: build and serve the site, then: node tools/bench-poster/render.mjs http://localhost:4173/
-// Re-run whenever src/three/BenchScene.tsx changes how the bench looks.
+// Re-run whenever src/three/TurntableScene.tsx changes how the first build looks.
 import { chromium } from "playwright";
 import sharp from "sharp";
 const b = await chromium.launch({
@@ -12,12 +12,9 @@ await p.mouse.move(30, 880);
 await p.mouse.move(32, 882);
 await p.waitForTimeout(6000);
 await p.addStyleTag({
-  content: `html,body{background:transparent!important} .mat-edges::before,.mat-edges::after,.vignette,.lamp,.loupe{display:none!important} img[src*="bench-poster"],[data-bench-labels],[data-hint]{display:none!important}`,
+  content: `html,body{background:transparent!important} .vignette,.lamp,.loupe{display:none!important} img[src*="bench-poster"]{display:none!important}`,
 });
-const box = p
-  .locator("canvas")
-  .first()
-  .locator('xpath=ancestor::div[contains(@class,"size-full")][1]');
+const box = p.locator("[data-stage]");
 await p.waitForTimeout(500);
 const buf = await box.screenshot({ omitBackground: true });
 const meta = await sharp(buf).metadata();

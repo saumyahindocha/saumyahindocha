@@ -87,8 +87,9 @@ export function PodLab() {
           <ul className="space-y-1.5 border-t border-line pt-3 font-mono text-xs text-sage">
             <li>Pico 2 W · PCM5102 DAC</li>
             <li>2.8&quot; 240×320 SPI touch screen + microSD</li>
-            <li>1000 mAh LiPo (planned)</li>
-            <li>≈ 57 × 115 × 24 mm</li>
+            <li>1000 mAh LiPo (ordered, not fitted)</li>
+            <li>Model: ≈ 57 × 115 × 24 mm PCB plan</li>
+            <li>Case Rev B: 57.2 × 125.0 × 21.8 mm</li>
           </ul>
         </div>
       </div>

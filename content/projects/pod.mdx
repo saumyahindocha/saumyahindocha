@@ -123,7 +123,7 @@ The story so far, from the dated build log:
 4. **Perfboard (8 to 10 Oct).** The JLCPCB quote for the assembled board was about $90, too much for one prototype, so the PCB design stays in the repo and I built the same layout on perfboard. I soldered it in one night, and the firmware now boots to the home screen with touch working, powered over USB.
 5. **Case (14 Oct).** I designed a printed case in CadQuery, fully parametric, with every dimension a named value at the top of the script. Rev A was a 57 × 114 × 23 mm snap-fit tray and bezel with no external screws. The same day, Rev B replaced the snap-fit with four M2 screws from underneath into pegs on the bezel, countersunk and hidden under the rubber feet. It came out at 57.2 × 125.0 × 21.8 mm: 5.4 mm longer at each end for the screw blocks and 0.9 mm thinner. The cavities are sized from the parts I ordered: TP4056 charger 29 × 17.3 × 4.3 mm, slide switch 13 × 6.5 × 5.5 mm, a 403048 LiPo and the GY-PCM5102 DAC. The repo has the STL and STEP files and a PDF with 1:1 paper templates. It has not been printed yet.
 
-Still to do: fit the replacement DAC and test audio again, then the TP4056 charger, switch and battery, then paper-check the screen window with the 1:1 template and print the case. Album art over Bluetooth now works on the real hardware.
+Pod is on hold for my end-semester exams since 25 Oct 2026. When work resumes: fit the replacement DAC, test audio, SD playback and phone streaming again, then paper-check the screen window with the 1:1 template, print the case, and fit the TP4056 charger, switch and battery. Album art over Bluetooth now works on the real hardware.
 
 ## What broke and how I fixed it
 
@@ -132,7 +132,7 @@ Still to do: fit the replacement DAC and test audio again, then the TP4056 charg
 - **Compiler kept breaking (7 Oct).** The laptop's antivirus removed parts of the toolchain, so all compiling moved to GitHub Actions.
 - **Schematic review (7 Oct).** On the power sheet, charger pins were unconnected, the two 22 µF output capacitors were in series and the gauge's 1 µF capacitor was missing.
 - **Gerber outline (8 Oct).** A stray 6.35 mm line from the jack footprint sat 2.2 mm inside the bottom edge. The fab would have milled it as a slot, so I removed it from the outline file.
-- **Dead DAC (10 Oct).** A wiring mistake on the perfboard killed the Adafruit PCM5102 DAC. A generic GY-PCM5102 board is on order to replace it; on that board the SCK pin goes to ground.
+- **Dead DAC (10 Oct).** A wiring mistake on the perfboard killed the Adafruit PCM5102 DAC. A generic GY-PCM5102 board replaces it. It is on hand with its own wiring sheet (SCK to ground, and the XSMT solder bridge set high or the chip stays muted) but not fitted yet.
 - **Touch read nothing (10 Oct).** On the finished perfboard, the pressed signal worked but every reading was all 0 or all 8191, and the setup dots accepted the garbage. Printing the raw readings on the screen pointed to the data line: the link from `GP4` to T_DO (holes F8 to F10) was open. Resoldering it fixed touch. I also hardened the firmware: MISO pulled up, readings above 4095 rejected as "line open", and a new calibration magic so the old breadboard calibration is ignored.
 
 ## What I took away

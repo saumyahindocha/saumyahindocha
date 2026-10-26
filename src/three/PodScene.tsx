@@ -386,7 +386,7 @@ export function Pod({
             material={shell}
             position={[0, 0, -0.1]}
           />
-          {showLabels && <Label at={[3.4, -5.6, 0]} text="57 × 115 × 24 mm" />}
+          {showLabels && <Label at={[3.4, -5.6, 0]} text="57 × 115 × 24 mm (PCB plan)" />}
         </group>
       </group>
     </>

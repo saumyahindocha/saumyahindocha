@@ -12,12 +12,12 @@ summary: 'A Pico 2 W music player: iPhone Bluetooth audio, an SD card player and
 headline:
 - value: 240×320
   label: touch UI on a 2.8" SPI screen
-- value: ~57 × 115 × 24 mm
-  label: planned device size (PCB version)
+- value: 57.2 × 125 mm
+  label: case Rev B, 21.8 mm thick; designed, not printed yet
 - value: 52 × 109 mm
   label: PCB Rev A, 2 layers, DRC clean
 - value: 1000 mAh
-  label: LiPo, planned (not fitted yet)
+  label: LiPo (403048), ordered, not fitted yet
 tags:
 - Raspberry Pi Pico 2 W
 - C
@@ -27,6 +27,7 @@ tags:
 - EasyEDA Pro
 - GitHub Actions
 - Perfboard
+- CadQuery
 repo: https://github.com/saumyahindocha/iPOD
 links: []
 media:
@@ -53,6 +54,13 @@ media:
   src: /media/pod/pcb_layout_pico.webp
   width: 1100
   height: 1142
+- alt: 'Render of the Pod case Rev B: a dark tray with a copper bezel, shown closed on the left and
+    with the bezel lifted on the right to show its four screw pegs, the screen window and the
+    headphone-jack hole'
+  caption: 'Case Rev B, rendered from the repo''s STL files: closed, and with the bezel lifted'
+  src: /media/pod/case_rev_b.webp
+  width: 1240
+  height: 930
 model: pod
 lessons:
 - 'Print raw sensor readings on the device itself before trusting a calibration: that is how I found an
@@ -73,8 +81,8 @@ tile:
   headline:
   - value: 240×320
     label: touch UI
-  - value: 57×115×24
-    label: mm, device
+  - value: 57.2×125
+    label: mm, case Rev B
   - value: 52×109
     label: mm PCB, 2 layers
 areas:
@@ -92,7 +100,7 @@ The core requirement was Bluetooth A2DP, so the phone sends audio and Pod plays 
 ## How it works
 
 - **Controller:** Raspberry Pi Pico 2 W. I first planned an ESP32-S3, then dropped it because it has no Bluetooth Classic, which A2DP needs.
-- **Audio:** an Adafruit PCM5102 I2S DAC on `GP13` (DIN), `GP14` (BCK) and `GP15` (WSEL). WSEL must be BCK + 1 because the PIO side-set pins are consecutive.
+- **Audio:** a PCM5102 I2S DAC on `GP13` (DIN), `GP14` (BCK) and `GP15` (WSEL). WSEL must be BCK + 1 because the PIO side-set pins are consecutive.
 - **Screen:** a 2.8" 240×320 ILI9341 display with XPT2046 resistive touch and a microSD slot, all sharing SPI0. The display's SDO line stays disconnected so it does not corrupt touch readings.
 - **Battery:** a divider on `GP28` read by the firmware, with an optional MAX17048 fuel gauge. A battery icon shows the level and a "Battery low" warning appears below 15 %.
 
@@ -113,8 +121,9 @@ The story so far, from the dated build log:
 2. **Firmware on PC (7 Oct).** The home screen, SD player and battery gauge were built and tested on a PC first. The track reader was checked against CBR and VBR MP3, ID3v2.3/2.4 tags and 16/24-bit WAV, and a PC preview renders the screens.
 3. **PCB Rev A (7 to 8 Oct).** The first plan was a bare RP2350A with a separate radio on a 4-layer board. I switched to soldering my Pico 2 W onto the board instead, which removed the chip, flash, crystal and regulator design and allowed 2 layers. I drew it in EasyEDA Pro: four schematic sheets, a 52 × 109 mm board, GND pours on both layers and a 9 × 14 mm antenna cut-out. DRC was clean apart from the expected notch item, and I exported the Gerbers, a 23-line BOM and pick-and-place.
 4. **Perfboard (8 to 10 Oct).** The JLCPCB quote for the assembled board was about $90, too much for one prototype, so the PCB design stays in the repo and I built the same layout on perfboard. I soldered it in one night, and the firmware now boots to the home screen with touch working, powered over USB.
+5. **Case (14 Oct).** I designed a printed case in CadQuery, fully parametric, with every dimension a named value at the top of the script. Rev A was a 57 × 114 × 23 mm snap-fit tray and bezel with no external screws. The same day, Rev B replaced the snap-fit with four M2 screws from underneath into pegs on the bezel, countersunk and hidden under the rubber feet. It came out at 57.2 × 125.0 × 21.8 mm: 5.4 mm longer at each end for the screw blocks and 0.9 mm thinner. The cavities are sized from the parts I ordered: TP4056 charger 29 × 17.3 × 4.3 mm, slide switch 13 × 6.5 × 5.5 mm, a 403048 LiPo and the GY-PCM5102 DAC. The repo has the STL and STEP files and a PDF with 1:1 paper templates. It has not been printed yet.
 
-Still to do: SD playback and phone streaming on the perfboard, and the TP4056 charger, switch and battery, which have not been fitted yet. Album art over Bluetooth now works on the real hardware.
+Pod is on hold for my end-semester exams since 25 Oct 2026. When work resumes: fit the replacement DAC, test audio, SD playback and phone streaming again, then paper-check the screen window with the 1:1 template, print the case, and fit the TP4056 charger, switch and battery. Album art over Bluetooth now works on the real hardware.
 
 ## What broke and how I fixed it
 
@@ -123,6 +132,7 @@ Still to do: SD playback and phone streaming on the perfboard, and the TP4056 ch
 - **Compiler kept breaking (7 Oct).** The laptop's antivirus removed parts of the toolchain, so all compiling moved to GitHub Actions.
 - **Schematic review (7 Oct).** On the power sheet, charger pins were unconnected, the two 22 µF output capacitors were in series and the gauge's 1 µF capacitor was missing.
 - **Gerber outline (8 Oct).** A stray 6.35 mm line from the jack footprint sat 2.2 mm inside the bottom edge. The fab would have milled it as a slot, so I removed it from the outline file.
+- **Dead DAC (10 Oct).** A wiring mistake on the perfboard killed the Adafruit PCM5102 DAC. A generic GY-PCM5102 board replaces it. It is on hand with its own wiring sheet (SCK to ground, and the XSMT solder bridge set high or the chip stays muted) but not fitted yet.
 - **Touch read nothing (10 Oct).** On the finished perfboard, the pressed signal worked but every reading was all 0 or all 8191, and the setup dots accepted the garbage. Printing the raw readings on the screen pointed to the data line: the link from `GP4` to T_DO (holes F8 to F10) was open. Resoldering it fixed touch. I also hardened the firmware: MISO pulled up, readings above 4095 rejected as "line open", and a new calibration magic so the old breadboard calibration is ignored.
 
 ## What I took away
